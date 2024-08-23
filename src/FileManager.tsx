@@ -1,6 +1,8 @@
-import React, { useRef } from 'jsx-dom';
+import React from 'jsx-dom';
 import { startApplication } from './desktop';
 import Notes from './Notes';
+import IframeWindow from './IframeWindow';
+import blogs from "./assets/blogs.svg"
 
 
 const root = {
@@ -8,39 +10,75 @@ const root = {
     type: 'folder',
     children: [
         {
-            name: 'folder1',
+            name: "Projects",
             type: 'folder',
             children: [
                 {
-                    name: 'file1',
-                    type: 'file',
-                    content: 'Hello, I am file1'
+                    name: "Job Hunter",
+                    type: 'file_html',
+                    link: "https://jobhunt-ea01a.web.app"
                 },
-                {
-                    name: 'file2',
-                    type: 'file',
-                    content: 'Hello, I am file2'
-                }
             ]
         },
         {
-            name: 'file3',
-            type: 'file',
-            content: 'Hello, I am file3'
+            name: "Personal",
+            type: 'folder',
+            children: [
+                {
+                    name: "Resume",
+                    type: 'file_html',
+                    link: "https://drive.google.com/file/d/1vvJDaZbnTc6ewFNhk3-CrgFdqtXa7Oa7/preview"
+                },
+            ]
+        },
+        {
+            name: "Blogs",
+            type: 'folder',
+            children: [
+                {
+                    name: "My Blogs",
+                    type: 'window_open',
+                    window_name: "blogs",
+                },
+            ]
+        },
+        {
+            name: "Social",
+            type: 'folder',
+            children: [
+                {
+                    name: "LinkedIn",
+                    type: 'link_open',
+                    link: "https://www.linkedin.com/in/ayush-deshpande/"
+                },
+                {
+                    name: "Github",
+                    type: 'link_open',
+                    link: "https://github.com/asyncdoggo",
+                },
+                {
+                    name: "Instagram",
+                    type: 'link_open',
+                    link: "https://www.instagram.com/ayush.arc/",
+                },
+            ]
         }
     ]
 }
 
-let currentFolder = root
+let currentFolder: any = root
 
 
 
-export default function FileManager() {
+export default function FileManager({rootFolderName}:any) {
+
+    if(rootFolderName){
+        currentFolder = root.children.find((child: any) => child.name === rootFolderName)
+    }
 
     return (
         <div className="w-full h-full">
             <div className="file-manager bg-gray-100 w-full h-full flex flex-col justify-center items-center">
-                {/* a filemanager title bar with back button and opened folder name */}
                 <div 
                 className="file-manager-title-bar bg-white p-2 rounded-lg shadow-lg flex justify-between items-center w-full"
                 >
@@ -87,20 +125,34 @@ function openFolder(folder: any) {
 
 
 function FileList () {
+
+
+    function openFile(child: any) {
+        if(child.type === 'folder'){
+            openFolder(child)
+        } else if (child.type === 'file'){
+            openFile(child)
+        }
+        else if (child.type === 'file_html'){
+            openHtmlFile(child)
+        }
+        else if (child.type === 'link_open'){
+            window.open(child.link, '_blank')
+        }
+        else if (child.type === 'window_open'){
+            startApplication(child.name, blogs, <Notes content="My Blogs"/>)
+        }
+    }
+
+
     return (
         <ul>
         {currentFolder.children.map((child: any, index: number) => {
             return (
                 <li 
                 key={index} 
-                className="file-manager-item flex flex-row" 
-                onClick={() => {
-                    if(child.type === 'folder'){
-                        openFolder(child)
-                    } else {
-                        openFile(child)
-                    }
-                } }
+                className="file-manager-item flex flex-row hover:cursor-pointer"
+                onClick={() => openFile(child)}
                 >
                     <img src={child.type === 'folder' ? 'https://img.icons8.com/ios-glyphs/30/000000/folder-invoices--v1.png' : 'https://img.icons8.com/ios-glyphs/30/000000/file.png'} alt="file" className="h-6 w-6" />
                     <span>{child.name}</span>
@@ -112,6 +164,6 @@ function FileList () {
 }
 
 
-function openFile(file: any) {
-    startApplication("Notes", 'https://img.icons8.com/ios-glyphs/30/000000/file.png', <Notes content={file.content} />)
+function openHtmlFile(file: any) {
+    startApplication(file.name, 'https://img.icons8.com/ios-glyphs/30/000000/file.png', <IframeWindow src={file.link} />)
 }

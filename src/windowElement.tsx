@@ -64,7 +64,7 @@ export default function Window({ appName, appIcon, appComponent }: { appName: st
 
     return (
         <div
-            className="app-window fixed top-1/2 left-1/2 w-96 h-96 bg-white shadow-lg rounded-lg resize overflow-auto select-none"
+            className="app-window fixed top-0 left-0 w-[400px] h-[450px] min-w-[200px] min-h-[200px] bg-white shadow-lg rounded-lg resize overflow-auto select-none"
             ref={windowRef}
             id={appName}
             onMouseDown={() => {

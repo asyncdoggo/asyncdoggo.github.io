@@ -5,6 +5,8 @@ import Profile from './Profile';
 import settings from "./assets/settings.svg"
 import file_manager from "./assets/file_manager.svg"
 import FileManager from './FileManager';
+import projects_icon from "./assets/projects.svg"
+import blogs from "./assets/blogs.svg"
 
 
 export function updateTaskBar() {
@@ -96,20 +98,20 @@ function StartMenu() {
     
     const startItems = [
         {
-            name: "Games",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png",
-            component: <div>Games</div>
+            name: "Projects",
+            icon: projects_icon,
+            component: <FileManager rootFolderName="Projects"/>
         },
         {
-            name: "Browser",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png",
-            component: <div>Browser</div>
+            name: "Blogs",
+            icon: blogs,
+            component: <FileManager rootFolderName="Blogs"/>
         },
-        {
-            name: "Email",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png",
-            component: <div>Email</div>
-        },
+        // {
+        //     name: "Browser",
+        //     icon: browser,
+        //     component: <IframeWindow src="https://duckduckgo.com" />
+        // },
         {
             name: "File Explorer",
             icon: file_manager,
@@ -148,7 +150,7 @@ function StartMenu() {
                         startApplication(item.name, item.icon, item.component)
                     }}
                     >
-                        <img src={item.icon} alt={item.name} className="h-8 w-8"/>
+                        <img src={item.icon} alt={item.name} className="h-8 w-8 invert"/>
                         <span className="ml-2">{item.name}</span>
                     </div>
                 ))}
