@@ -115,7 +115,7 @@ function StartMenu() {
         {
             name: "File Explorer",
             icon: file_manager,
-            component: <FileManager/>
+            component: <FileManager rootFolderName="root"/>
         },
     ]
 

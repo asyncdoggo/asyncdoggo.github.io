@@ -71,10 +71,13 @@ let currentFolder: any = root
 
 
 export default function FileManager({rootFolderName}:any) {
-
     if(rootFolderName){
         currentFolder = root.children.find((child: any) => child.name === rootFolderName)
     }
+    if (rootFolderName == "root") {
+        currentFolder = root
+    }
+    
 
     return (
         <div className="w-full h-full">
