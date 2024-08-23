@@ -1,5 +1,6 @@
 import React from "jsx-dom"
 import Desktop from "./desktop"
 
-
-document.body.appendChild(<Desktop/>)
+window.addEventListener('load', () => {
+    document.body.appendChild(<Desktop/>)
+})

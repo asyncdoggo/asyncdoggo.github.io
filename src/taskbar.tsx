@@ -3,6 +3,8 @@ import { startApplication } from './desktop';
 import { openApps, toggleMinimizeWindow } from './globals';
 import Profile from './Profile';
 import settings from "./assets/settings.svg"
+import file_manager from "./assets/file_manager.svg"
+import FileManager from './FileManager';
 
 
 export function updateTaskBar() {
@@ -96,18 +98,22 @@ function StartMenu() {
         {
             name: "Games",
             icon: "https://freesvg.org/img/abstract-user-flat-4.png",
+            component: <div>Games</div>
         },
         {
             name: "Browser",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png"
+            icon: "https://freesvg.org/img/abstract-user-flat-4.png",
+            component: <div>Browser</div>
         },
         {
             name: "Email",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png"
+            icon: "https://freesvg.org/img/abstract-user-flat-4.png",
+            component: <div>Email</div>
         },
         {
             name: "File Explorer",
-            icon: "https://freesvg.org/img/abstract-user-flat-4.png"
+            icon: file_manager,
+            component: <FileManager/>
         },
     ]
 
@@ -116,8 +122,7 @@ function StartMenu() {
 
     return (
         <div 
-        className="start-menu bg-black fixed w-64 h-[40vh] border border-gray-300 rounded-lg shadow-lg hidden"
-        style={{bottom: "50px"}}
+        className="start-menu bg-[#a22666] fixed w-64 h-[40vh] border border-gray-300 rounded-lg shadow-lg hidden select-none bottom-[50px]"
         ref={startMenuRef}
         id='start-menu'
         >
@@ -136,11 +141,11 @@ function StartMenu() {
             <div className="flex flex-col items-center">
                 {startItems.map((item) => (
                     <div 
-                    className="flex items-center p-2 hover:bg-gray-300 w-full"
+                    className="flex items-center p-2 hover:bg-gray-300 w-full hover:cursor-pointer"
                     onClick={() => {
                         showStartMenu = false
                         handleRenderStartMenu()
-                        startApplication(item.name, item.icon, <div>{item.name}</div>)
+                        startApplication(item.name, item.icon, item.component)
                     }}
                     >
                         <img src={item.icon} alt={item.name} className="h-8 w-8"/>

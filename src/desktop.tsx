@@ -2,7 +2,8 @@ import React, { JSX } from 'jsx-dom';
 import Taskbar, { updateTaskBar } from './taskbar';
 import { openApps } from './globals';
 import Window from './windowElement';
-
+import file_manager from "./assets/file_manager.svg"
+import FileManager from './FileManager';
 
 
 export default function Desktop() {
@@ -10,8 +11,8 @@ export default function Desktop() {
       <div className="desktop">
         <div className="Desktop-icons-grid">
             
-            <button className="icon" onClick={() => startApplication('File Explorer', 'https://cdn-icons-png.flaticon.com/512/732/732221.png', <div>File Explorer</div>)}>
-                <img src="https://cdn-icons-png.flaticon.com/512/732/732221.png" alt="icon" className="h-12 w-12"/>
+            <button className="icon" onClick={() => startApplication('File Explorer', file_manager, <FileManager />)}>
+                <img src={file_manager} alt="File Explorer" className="h-16 w-16"/>
                 <p>File Explorer</p>
             </button>
         </div>

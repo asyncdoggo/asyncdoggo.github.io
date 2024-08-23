@@ -1,7 +1,9 @@
 import React, { JSX } from "jsx-dom"
 import { useRef } from "jsx-dom"
-import { currentFocusedApp, openApps, setCurrentFocusedApp, toggleMinimizeWindow } from "./globals"
+import { currentFocusedApp, openApps, removeCurrentFocusedApp, setCurrentFocusedApp, toggleMaximizeWindow, toggleMinimizeWindow } from "./globals"
 import { updateTaskBar } from "./taskbar"
+import maximize from "./assets/maximize.svg"
+import minimize from "./assets/minimize.svg"
 
 
 
@@ -18,6 +20,7 @@ export default function Window({ appName, appIcon, appComponent }: { appName: st
         if (desktop) {
             desktop.removeChild(windowRef.current!)
             openApps.splice(openApps.findIndex(app => app.name === appName), 1)
+            currentFocusedApp === appName && removeCurrentFocusedApp()
             updateTaskBar()
         }
     }
@@ -58,18 +61,13 @@ export default function Window({ appName, appIcon, appComponent }: { appName: st
     }
 
 
-   
+
     return (
         <div
-            className="app-window fixed top-1/2 left-1/2 w-96 h-96 bg-white shadow-lg rounded-lg resize overflow-auto"
+            className="app-window fixed top-1/2 left-1/2 w-96 h-96 bg-white shadow-lg rounded-lg resize overflow-auto select-none"
             ref={windowRef}
             id={appName}
             onMouseDown={() => {
-                if(currentFocusedApp){
-                    const f = document.getElementById(currentFocusedApp)
-                    f!.style.zIndex = "0"
-                }
-                windowRef.current!.style.zIndex = "999"
                 setCurrentFocusedApp(appName)
             }}
         >
@@ -82,25 +80,31 @@ export default function Window({ appName, appIcon, appComponent }: { appName: st
                     <h1 className="ml-2">{appName}</h1>
                 </div>
 
-                <div className="flex flex-row gap-x-2 justify-center items-center">
+                <div className="flex flex-row justify-center items-center">
 
-                <button 
-                className="minimize"
-                onClick={() => toggleMinimizeWindow(appName)}
-                >
-                    --
-                </button>
+                    <button
+                        className="minimize w-8 h-8"
+                        onClick={() => toggleMinimizeWindow(appName)}
+                    >
+                        <img src={minimize} alt="minimize" className="w-4" />
+                    </button>
 
+                    <button 
+                    className="maximize w-8 h-8"
+                    onClick={() => toggleMaximizeWindow(appName)}
+                    >
+                        <img src={maximize} alt="resize" className="w-4" />
+                    </button>
 
-                <button className="close-button"
-                    onClick={() => closeWindow(appName)}
-                >
-                    X
-                </button>
+                    <button className="close-button w-8 h-8"
+                        onClick={() => closeWindow(appName)}
+                    >
+                        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" alt="minimize" className="w-4" />
+                    </button>
 
                 </div>
             </div>
-            <div className="p-2">
+            <div className="p-2 select-text">
                 {appComponent}
             </div>
         </div>
