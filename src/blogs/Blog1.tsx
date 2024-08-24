@@ -1,18 +1,9 @@
 import React, { useRef } from "jsx-dom";
+import { waitForElement } from "../globals";
 
 declare global {
     interface Window {
         MathJax: any;
-    }
-}
-
-function waitForElement(selector: string, callback: any) {
-    if (document.querySelector(selector)) {
-        callback();
-    } else {
-        setTimeout(() => {
-            waitForElement(selector, callback);
-        }, 100);
     }
 }
 

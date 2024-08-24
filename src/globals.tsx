@@ -37,6 +37,7 @@ export function toggleMinimizeWindow(id: string) {
 
 export function toggleMaximizeWindow(id: string) {
     const windowElement = document.getElementById(id)!
+    
     if (windowElement.style.width === '100%') {
         windowElement.style.width = '400px'
         windowElement.style.height = '400px'
@@ -49,5 +50,17 @@ export function toggleMaximizeWindow(id: string) {
         const browserHeight = window.innerHeight
         const taskbarHeight = document.getElementById('taskbar_main')!.clientHeight
         windowElement.style.height = `${browserHeight - taskbarHeight}px`
+    }
+}
+
+
+
+export function waitForElement(selector: string, callback: any) {
+    if (document.querySelector(selector)) {
+        callback();
+    } else {
+        setTimeout(() => {
+            waitForElement(selector, callback);
+        }, 100);
     }
 }
