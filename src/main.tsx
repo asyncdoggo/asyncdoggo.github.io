@@ -4,6 +4,7 @@ import BlogsHome from "./blogs/BlogsHome"
 import BlogRouter from "./blogs/BlogsRouter"
 import "./index.css"
 
+
 window.addEventListener('load', () => {
     if(window.location.pathname.startsWith('/blogs')){
         // Get the blog number from the url
