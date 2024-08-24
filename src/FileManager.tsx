@@ -1,4 +1,4 @@
-import React from 'jsx-dom';
+import React, { useRef } from 'jsx-dom';
 import { startApplication } from './desktop';
 import Notes from './Notes';
 import IframeWindow from './IframeWindow';
@@ -37,8 +37,8 @@ const root = {
             children: [
                 {
                     name: "My Blogs",
-                    type: 'window_open',
-                    window_name: "blogs",
+                    type: 'redirect',
+                    path: "/blogs/",
                 },
             ]
         },
@@ -66,16 +66,33 @@ const root = {
     ]
 }
 
-let currentFolder: any = root
 
 
 
 export default function FileManager({rootFolderName}:any) {
+
+    const titleRef = useRef<HTMLDivElement>(null)
+    const fileListRef = useRef<HTMLDivElement>(null)
+
+    let currentFolder: any = root
     if(rootFolderName){
         currentFolder = root.children.find((child: any) => child.name === rootFolderName)
     }
     if (rootFolderName == "root") {
         currentFolder = root
+    }
+
+    function openFolder(folder: any) {
+        currentFolder = folder
+        const folderName = titleRef.current?.querySelector('h1')
+        if(folderName){
+            folderName.innerHTML = folder.name
+        }
+        const fileList = fileListRef.current
+        if(fileList){
+            fileList.innerHTML = ""
+            fileList.appendChild(<FileList currentFolder={currentFolder} setCurrentFolder={openFolder} />)
+        }
     }
     
 
@@ -84,10 +101,11 @@ export default function FileManager({rootFolderName}:any) {
             <div className="file-manager bg-gray-100 w-full h-full flex flex-col justify-center items-center">
                 <div 
                 className="file-manager-title-bar bg-white p-2 rounded-lg shadow-lg flex justify-between items-center w-full"
+                ref={titleRef}
                 >
                     <button 
                     className="back-button"
-                    onClick={() => {
+                    onClick={() => {                        
                         if(currentFolder.name === 'root'){
                             return
                         }
@@ -103,8 +121,9 @@ export default function FileManager({rootFolderName}:any) {
 
                 <div 
                 className="file-manager-list flex flex-col w-full gap-y-2 justify-start items-start"
+                ref={fileListRef}
                 >
-                    <FileList />
+                    <FileList currentFolder={currentFolder} setCurrentFolder={openFolder} />
                 </div>
             </div>
         </div>
@@ -112,27 +131,28 @@ export default function FileManager({rootFolderName}:any) {
 }
 
 
-function openFolder(folder: any) {
-    currentFolder = folder
-    const folderName = document.querySelector('.file-manager-title-bar h1')
-    if(folderName){
-        folderName.innerHTML = folder.name
-    }
-    const fileList = document.querySelector('.file-manager-list')
-    if(fileList){
-        fileList.innerHTML = ""
-        fileList.appendChild(<FileList />)
-    }
-}
+// function openFolder(folder: any) {
+//     currentFolder = folder
+//     const folderName = document.querySelector('.file-manager-title-bar h1')
+//     if(folderName){
+//         folderName.innerHTML = folder.name
+//     }
+//     const fileList = document.querySelector('.file-manager-list')
+//     if(fileList){
+//         fileList.innerHTML = ""
+//         fileList.appendChild(<FileList />)
+//     }
+// }
 
 
 
-function FileList () {
+function FileList ({currentFolder, setCurrentFolder}: any) {
 
-
+        
+    
     function openFile(child: any) {
         if(child.type === 'folder'){
-            openFolder(child)
+            setCurrentFolder(child)
         } else if (child.type === 'file'){
             openFile(child)
         }
@@ -144,6 +164,9 @@ function FileList () {
         }
         else if (child.type === 'window_open'){
             startApplication(child.name, blogs, <Notes content="My Blogs"/>)
+        }
+        else if (child.type === 'redirect'){
+            window.location.href = child.path
         }
     }
 
