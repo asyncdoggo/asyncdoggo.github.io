@@ -1,5 +1,5 @@
 import React, { useRef } from "jsx-dom";
-
+declare const MathJax: any;
 
 function waitForElement(selector: string, callback: any) {
     if (document.querySelector(selector)) {
