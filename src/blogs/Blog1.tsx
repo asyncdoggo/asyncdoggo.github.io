@@ -1,6 +1,10 @@
 import React, { useRef } from "jsx-dom";
 
-declare var MathJax: any;
+declare global {
+    interface Window {
+        MathJax: any;
+    }
+}
 
 function waitForElement(selector: string, callback: any) {
     if (document.querySelector(selector)) {
@@ -42,7 +46,7 @@ export default function Blog1() {
     waitForElement("#blog1main", () =>{
         drawCar1();
         drawCar2();
-        MathJax.typesetPromise();
+        window.MathJax.typesetPromise();
     });
 
     
