@@ -54,7 +54,7 @@ export default function Blog1() {
             </div>
 
             {/* Content */}
-            <div className="md:w-2/3 w-full self-center flex flex-col items-start justify-center">
+            <div className="md:w-2/3 w-full self-center flex flex-col items-start justify-center mb-8">
                 <p className="w-full pt-8 px-2 text-lg font-sans">
                     When you hear the word <i>limit</i>, you might think of something that stops or restricts. For example, roller coasters have height limits for safety. Similarly  in mathematics, A limit is the value a function approaches as its input gets closer to some value.
                     Or in simple words, a limit is a value beyond which a function cannot go.
@@ -197,9 +197,14 @@ export default function Blog1() {
                     
                 </p>
 
-                <p className="w-full pt-8 px-2 text-lg font-sans">
-                    So, as we turn up the wind, Car 2 will always take more time than Car 1, illustrating a surprising truth revealed by limits.
-                </p>
+                <div className="did-you-know-card w-full p-4 border border-gray-500 mt-8">
+                    <p className="text-lg font-bold">Did you know?</p>
+                    <p className="text-lg font-sans">
+                        This example is often coined in a very famous experiment called the <b>Michaelson-Morley Experiment</b> which was conducted to disprove the existence of the luminiferous aether, a hypothetical medium through which light was thought to travel.
+                        It was believed that there was a medium called aether through which light traveled. Therefore, the speed of light should be affected by the drift of the aether. However, the experiment showed that the speed of light was constant, regardless of the direction of the light or the speed of the observer. This experiment was a major step in the development of the theory of relativity.
+                    </p>                    
+                    <a href="https://en.wikipedia.org/wiki/Michelson%E2%80%93Morley_experiment" className="text-blue-500">Read more</a>
+                </div>
 
             </div>
         </div>
@@ -210,20 +215,27 @@ export default function Blog1() {
 
 const MovingCar = ({wind, color}:any) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    
     const car = {
         x: 30,
         y: 60,
         speed: 1
     } as { x: number, y: number, speed: number };
+    
     let ctx = canvasRef.current?.getContext('2d');
+    
     let time = 0;
     let paused = true;
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    let windState = car.speed * wind;
+    
+    // Wind stuff (should only be used if wind is not 0)
+    let windState = 0
     const windSpeedLabelRef = useRef<HTMLLabelElement>(null);
     const setWindState = (value: number) => {
         windState = car.speed * value;
-        windSpeedLabelRef.current!.innerHTML = `Wind Speed: ${value}`;
+        if(windSpeedLabelRef.current){
+            windSpeedLabelRef.current!.innerHTML = `Wind Speed: ${value}`;
+        }
     }
 
     let carDirection = 1
@@ -303,15 +315,24 @@ const MovingCar = ({wind, color}:any) => {
         ctx = canvasRef.current!.getContext('2d');
         canvasRef.current!.width = window.innerWidth - 100 
         canvasRef.current!.height = 200;
-        if(windSpeedLabelRef.current){
+        if(wind !== 0 && windSpeedLabelRef.current){
             windSpeedLabelRef.current!.innerHTML = `Wind Speed: ${windState}`;
+            setWindState(wind)
         }
-        // set car speed to the aspect ratio of the canvas
-        car.speed = canvasRef.current!.width / canvasRef.current!.height;
+        const shouldTakeTime = 500;
+        const distance = canvasRef.current!.width * 2;
+        car.speed = distance / shouldTakeTime;
         draw();
+
         window.addEventListener('resize', () => {
             canvasRef.current!.width = window.innerWidth - 100;
             canvasRef.current!.height = 200;
+            const shouldTakeTime = 500;
+            const distance = canvasRef.current!.width * 2;
+            car.speed = distance / shouldTakeTime;
+            if (wind !== 0) {
+                setWindState(parseFloat((document.getElementById('wind_slider') as HTMLInputElement).value));
+            }
         });
     });
 
@@ -337,7 +358,7 @@ const MovingCar = ({wind, color}:any) => {
             {
                 wind === 0 ? <></> :
                 <>
-                <input type="range" min="0.1" max="1" step="0.1" value={windState} onChange={(e) => {setWindState(parseFloat(e.currentTarget.value))} } />
+                <input type="range" min="0.1" max="1" step="0.1" value={wind} id="wind_slider" onChange={(e) => {setWindState(parseFloat(e.currentTarget.value))} } />
                 <label ref={windSpeedLabelRef}></label>
                 </>
 

@@ -4,54 +4,70 @@ import '@fontsource/gloria-hallelujah';
 import { waitForElement } from '../globals';
 
 
-export default function Tictactoe() {
 
+export default function TicTacToe() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const playerTurnRef = useRef<HTMLParagraphElement>(null)
     const winnerRef = useRef<HTMLParagraphElement>(null)
     const resetRef = useRef<HTMLButtonElement>(null)
     const gameWindowRef = useRef<HTMLDivElement>(null)
+    const youAreRef = useRef<HTMLParagraphElement>(null)
 
 
     waitForElement('#tictactoecanvas', () => {
         const board = new Array(9).fill('')
+        let player = Math.random() < 0.5 ? 'X' : 'O'
+        let AiPlayer = player === 'X' ? 'O' : 'X'
         let currentPlayer = 'X'
         let gameOver = false
         const canvas = canvasRef.current!
         const ctx = canvas.getContext('2d')!
         playerTurnRef.current!.textContent = `Player ${currentPlayer}'s turn`
+        youAreRef.current!.textContent = `You are ${player}`
 
 
-        new ResizeObserver((e) => {
-            const data = e[0]
 
-            const width = data.contentRect.width
-            const height = data.contentRect.height
-            gameWindowRef.current!.style.width = width + 'px'
-            gameWindowRef.current!.style.height = height  + 'px'
+        const parent_window = document.querySelector('#TicTacToe')
+        if (parent_window) {
+            new ResizeObserver((e) => {
+                const data = e[0]
 
-            if (width < 700) {
-                canvas.width = width - 100
+                const width = data.contentRect.width
+                const height = data.contentRect.height
+                if (gameWindowRef.current) {
+                    gameWindowRef.current.style.width = width + 'px'
+                    gameWindowRef.current.style.height = height + 'px'
+                }
+                if (width < 600) {
+                    canvas.width = width - 100
+                }
+                else {
+                    canvas.width = 500
+                }
+                if (height < 600) {
+                    canvas.height = height - 200
+                }
+                else {
+                    canvas.height = 500
+                }
+
+                drawBoard()
+            }).observe(parent_window)
+        }
+
+
+
+        // Game Loop
+        const gameLoop = () => {            
+            if (currentPlayer === AiPlayer) {
+                AiMove()
             }
-            else {
-                canvas.width = 600
-            }
-            if (height < 700){
-                canvas.height = height - 200
-            }
-            else {
-                canvas.height = 600
-            }
-            
+        }
 
-            drawBoard()
-
-
-        }).observe(document.querySelector('#TicTacToe')!)
-
-
+        // player move
         canvas.addEventListener('click', (event) => {
             if (gameOver) return
+            if(currentPlayer === AiPlayer) return
             const rect = canvas.getBoundingClientRect()
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
@@ -80,6 +96,62 @@ export default function Tictactoe() {
 
             drawBoard()
         })
+
+
+        const minimax = (board: string[], player: string) => {
+              if (checkWinner()) {
+                return { score: player === AiPlayer ? -10 : 10, index: -1 }
+            }
+            if (checkDraw()) {
+                return { score: 0 , index: -1 }
+            }
+
+            let bestMove = -1
+            let bestScore = player === AiPlayer ? -Infinity : Infinity
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === '') {
+                    board[i] = player
+                    const score = minimax(board, player === 'X' ? 'O' : 'X').score
+                    board[i] = ''
+                    if (player === AiPlayer) {
+                        if (score > bestScore) {
+                            bestScore = score
+                            bestMove = i
+                        }
+                    } else {
+                        if (score < bestScore) {
+                            bestScore = score
+                            bestMove = i
+                        }
+                    }
+                }
+            }
+            return { score: bestScore, index: bestMove }
+        }
+
+        
+        const AiMove = () => {
+            if (gameOver) return
+            const bestMove = minimax(board, AiPlayer).index
+            console.log(bestMove);
+            
+            
+            board[bestMove] = AiPlayer
+            currentPlayer = player
+            playerTurnRef.current!.textContent = `Player ${currentPlayer}'s turn`
+
+            if (checkWinner()) {
+                gameOver = true
+                winnerRef.current!.textContent = `Player ${currentPlayer === 'X' ? 'O' : 'X'} wins!`
+            }
+
+            if (checkDraw()) {
+                gameOver = true
+                winnerRef.current!.textContent = 'Draw!'
+            }
+
+            drawBoard()
+        }
 
         function checkWinner() {
             for (let i = 0; i < 3; i++) {
@@ -141,7 +213,10 @@ export default function Tictactoe() {
         resetRef.current!.onclick = () => {
             board.fill('')
             currentPlayer = 'X'
+            player = Math.random() < 0.5 ? 'X' : 'O'
+            AiPlayer = player === 'X' ? 'O' : 'X'
             gameOver = false
+            youAreRef.current!.textContent = `You are ${player}`
             playerTurnRef.current!.textContent = `Player ${currentPlayer}'s turn`
             winnerRef.current!.textContent = ''
             drawBoard()
@@ -151,7 +226,11 @@ export default function Tictactoe() {
         winnerRef.current!.textContent = ''
 
         drawBoard()
+
+
+        setInterval(gameLoop, 1000)
     })
+        
 
     return (
         <div
@@ -160,6 +239,11 @@ export default function Tictactoe() {
             ref={gameWindowRef}
         >
             <div className="flex  flex-col justify-center items-center">
+                <p
+                    ref={youAreRef}
+                    className="text-4xl"
+                ></p>
+         
                 <canvas
                     id="tictactoecanvas"
                     width="600"
@@ -186,5 +270,7 @@ export default function Tictactoe() {
 
         </div>
     )
+
+
 }
 
