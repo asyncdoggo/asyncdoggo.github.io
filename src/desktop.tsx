@@ -6,6 +6,8 @@ import file_manager_icon from "./assets/file_manager.svg"
 import FileManager from './FileManager';
 import Tictactoe from './games/tictactoe';
 import tictactoe_icon from './assets/tictactoe.svg';
+import pong_icon from './assets/pong.svg';
+import Pong from './games/pong';
 
 export default function Desktop() {
     return (
@@ -20,6 +22,10 @@ export default function Desktop() {
                     <img src={tictactoe_icon} alt="TicTacToe" className="h-16 w-16" />
                     <p>TicTacToe</p>
                 </button>
+                <button className="icon" onClick={() => startApplication('Pong', pong_icon, <Pong />, '800px', '600px')}>
+                    <img src={pong_icon} alt="Pong" className="h-16 w-16" />
+                    <p>Pong</p>
+                </button>
             </div>
             <Taskbar />
         </div>
@@ -27,7 +33,13 @@ export default function Desktop() {
 }
 
 
-export function startApplication(appName: string, appIcon: string, appComponent: JSX.Element) {
+export function startApplication(
+    appName: string, 
+    appIcon: string, 
+    appComponent: JSX.Element,
+    width?: string,
+    height?: string
+) {
 
     if (openApps.find(app => app.name === appName)) {
         return
@@ -36,7 +48,7 @@ export function startApplication(appName: string, appIcon: string, appComponent:
     const desktop = document.querySelector('.desktop')
     if (desktop) {
 
-        desktop.appendChild(<Window appName={appName} appIcon={appIcon} appComponent={appComponent} />)
+        desktop.appendChild(<Window appName={appName} appIcon={appIcon} appComponent={appComponent} width={width} height={height} />)
         openApps.push({
             name: appName,
             icon: appIcon,

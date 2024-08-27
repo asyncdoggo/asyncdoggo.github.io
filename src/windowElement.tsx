@@ -7,7 +7,19 @@ import minimize from "./assets/minimize.svg"
 
 
 
-export default function Window({ appName, appIcon, appComponent }: { appName: string, appIcon: string, appComponent: JSX.Element }) {
+export default function Window(
+    {   appName, 
+        appIcon, 
+        appComponent,
+        width = '400px',
+        height = '450px', 
+    }: 
+    { appName: string, 
+        appIcon: string, 
+        appComponent: JSX.Element 
+        width?: string,
+        height?: string
+    }) {
     // If window already exists in openApps array, return null
     if (openApps.find(app => app.name === appName)) {
         return null
@@ -64,9 +76,10 @@ export default function Window({ appName, appIcon, appComponent }: { appName: st
 
     return (
         <div
-            className="app-window fixed top-0 left-0 w-[400px] h-[450px] min-w-[200px] min-h-[200px] bg-white shadow-lg rounded-lg resize overflow-auto select-none"
+            className="app-window fixed top-0 left-0 min-w-[200px] min-h-[200px] bg-white shadow-lg rounded-lg resize overflow-auto select-none"
             ref={windowRef}
             id={appName}
+            style={{ width, height }}
             onMouseDown={() => {
                 setCurrentFocusedApp(appName)
             }}
