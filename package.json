@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@fontsource/gloria-hallelujah": "^5.0.20",
-    "jsx-dom": "^8.1.4"
+    "jsx-dom": "^8.1.4",
+    "mathjs": "^13.1.1"
   }
 }

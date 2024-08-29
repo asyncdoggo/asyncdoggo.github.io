@@ -10,6 +10,7 @@ import pong_icon from './assets/pong.svg';
 import Pong from './games/pong';
 import airhockey_icon from './assets/air_hockey.svg';
 import AirHockey from './games/airhockey';
+import games_icon from './assets/games.svg';
 
 export default function Desktop() {
     return (
@@ -20,18 +21,12 @@ export default function Desktop() {
                     <img src={file_manager_icon} alt="File Explorer" className="h-16 w-16" />
                     <p>File Explorer</p>
                 </button>
-                <button className="icon" onClick={() => startApplication('TicTacToe', tictactoe_icon, <Tictactoe />, '600px', '600px')}>
-                    <img src={tictactoe_icon} alt="TicTacToe" className="h-16 w-16" />
-                    <p>TicTacToe</p>
+
+                <button className="icon" onClick={() => startApplication('Games', games_icon, <FileManager rootFolderName="Games" />)}>
+                    <img src={games_icon} alt="Games" className="h-16 w-16" />
+                    <p>Games</p>
                 </button>
-                <button className="icon" onClick={() => startApplication('Pong', pong_icon, <Pong />, '800px', '600px')}>
-                    <img src={pong_icon} alt="Pong" className="h-16 w-16" />
-                    <p>Pong</p>
-                </button>
-                <button className="icon" onClick={() => startApplication('Air Hockey', airhockey_icon, <AirHockey />, '600px', '800px')}>
-                    <img src={airhockey_icon} alt="Air Hockey" className="h-16 w-16" />
-                    <p>Air Hockey</p>
-                </button>
+
 
             </div>
             <Taskbar />
@@ -53,10 +48,7 @@ export function startApplication(
     }
 
     const desktop = document.querySelector('.desktop')
-    if (desktop) {
-        console.log(appComponent);
-        
-        
+    if (desktop) {        
         desktop.appendChild(<Window appName={appName} appIcon={appIcon} appComponent={appComponent} width={width} height={height} />)
         openApps.push({
             name: appName,
