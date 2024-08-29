@@ -1,13 +1,15 @@
 import React, { useRef } from 'jsx-dom';
 import { startApplication } from './desktop';
 import { openApps, toggleMinimizeWindow } from './globals';
-import Profile from './Profile';
 import settings from "./assets/settings.svg"
 import file_manager from "./assets/file_manager.svg"
-import FileManager from './FileManager';
+import FileManager from './apps/FileManager';
 import projects_icon from "./assets/projects.svg"
 import blogs from "./assets/blogs.svg"
-
+import Profile from './Profile';
+import Notes from './apps/Notes';
+import user_icon from "./assets/user.svg"
+import user_white from "./assets/user_white.svg"
 
 export function updateTaskBar() {
     const taskbarApps = document.getElementById('taskbar_apps')
@@ -58,7 +60,7 @@ export default function Taskbar() {
                 
             }}
             >
-                <img src="https://freesvg.org/img/abstract-user-flat-4.png" alt="user" className="h-8 w-8 ml-2"/>
+                <img src={user_icon} alt="user" className="h-8 w-8 ml-2"/>
             </div>  
             <StartMenu/>
 
@@ -107,15 +109,15 @@ function StartMenu() {
             icon: blogs,
             component: <FileManager rootFolderName="Blogs"/>
         },
-        // {
-        //     name: "Browser",
-        //     icon: browser,
-        //     component: <IframeWindow src="https://duckduckgo.com" />
-        // },
         {
             name: "File Explorer",
             icon: file_manager,
             component: <FileManager rootFolderName="root"/>
+        },
+        {
+            name: "Notes",
+            icon: settings,
+            component: <Notes />
         },
     ]
 
@@ -133,10 +135,10 @@ function StartMenu() {
             onClick={() => {
                 showStartMenu = false
                 handleRenderStartMenu()
-                startApplication('Profile', settings, <Profile/>)
+                startApplication('Profile', settings, <Profile />)
             }}
             >
-                <img src="https://freesvg.org/img/abstract-user-flat-4.png" alt="user" className="h-8 w-8 ml-2"/>
+                <img src={user_white} alt="user" className="h-8 w-8 ml-2"/>
                 <span className="text-white ml-2">Ayush Deshpande</span>
             </div>
             <hr className="border border-gray-300"/>

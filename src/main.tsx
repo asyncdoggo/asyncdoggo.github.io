@@ -16,9 +16,8 @@ window.addEventListener('load', () => {
         else{
             document.body.appendChild(<BlogRouter blogNumber={blogNumber}/>)
         }
-    }else{
+    }else{      
         document.body.appendChild(<Desktop/>)
     }
 
 })
-

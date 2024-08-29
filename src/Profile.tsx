@@ -2,6 +2,7 @@ import React from 'jsx-dom';
 import { startApplication } from './desktop';
 import IframeWindow from './IframeWindow';
 import resume_icon from "./assets/file_manager.svg"
+import user_icon from "./assets/user.svg"
 
 
 export default function Profile() {
@@ -10,7 +11,7 @@ export default function Profile() {
         <div className="profile bg-white w-full h-screen flex flex-col justify-start items-start">
             <div className="profile-header flex gap-x-4 justify-start items-center">
                 <div className="profile-image">
-                    <img src="https://freesvg.org/img/abstract-user-flat-4.png" alt="user" className="h-12 w-12" />
+                    <img src={user_icon} alt="user" className="h-12 w-12" />
                 </div>
                 <div className="profile-name">
                     <h1 className="text-2xl">Ayush Deshpande</h1>

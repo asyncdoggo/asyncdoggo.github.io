@@ -1,6 +1,4 @@
-
-
-export const openApps: { name: string, icon: string, component: Window & typeof globalThis }[] = []
+export const openApps: { name: string, icon: string}[] = []
 
 export let currentFocusedApp: string = ""
 

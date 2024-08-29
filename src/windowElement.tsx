@@ -30,10 +30,10 @@ export default function Window(
     function closeWindow(appName: string) {
         const desktop = document.querySelector('.desktop')
         if (desktop) {
-            desktop.removeChild(windowRef.current!)
             openApps.splice(openApps.findIndex(app => app.name === appName), 1)
             currentFocusedApp === appName && removeCurrentFocusedApp()
-            updateTaskBar()
+            updateTaskBar();
+            desktop.removeChild(windowRef.current!)
         }
     }
 
@@ -117,7 +117,7 @@ export default function Window(
 
                 </div>
             </div>
-            <div className="p-2 select-text">
+            <div className="elect-text">
                 {appComponent}
             </div>
         </div>
