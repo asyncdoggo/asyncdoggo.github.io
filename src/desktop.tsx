@@ -4,12 +4,6 @@ import { openApps } from './globals';
 import Window from './windowElement';
 import file_manager_icon from "./assets/file_manager.svg"
 import FileManager from './apps/FileManager';
-import Tictactoe from './games/tictactoe';
-import tictactoe_icon from './assets/tictactoe.svg';
-import pong_icon from './assets/pong.svg';
-import Pong from './games/pong';
-import airhockey_icon from './assets/air_hockey.svg';
-import AirHockey from './games/airhockey';
 import games_icon from './assets/games.svg';
 
 export default function Desktop() {
