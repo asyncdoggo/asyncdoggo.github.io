@@ -5,7 +5,6 @@ import settings from "./assets/settings.svg"
 import file_manager from "./assets/file_manager.svg"
 import FileManager from './apps/FileManager';
 import projects_icon from "./assets/projects.svg"
-import blogs from "./assets/blogs.svg"
 import Profile from './Profile';
 import Notes from './apps/Notes';
 import user_icon from "./assets/user.svg"
