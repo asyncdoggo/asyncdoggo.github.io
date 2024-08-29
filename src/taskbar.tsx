@@ -104,11 +104,11 @@ function StartMenu() {
             icon: projects_icon,
             component: <FileManager rootFolderName="Projects"/>
         },
-        {
-            name: "Blogs",
-            icon: blogs,
-            component: <FileManager rootFolderName="Blogs"/>
-        },
+        // {
+        //     name: "Blogs",
+        //     icon: blogs,
+        //     component: <FileManager rootFolderName="Blogs"/>
+        // },
         {
             name: "File Explorer",
             icon: file_manager,
