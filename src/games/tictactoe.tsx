@@ -26,37 +26,6 @@ export default function TicTacToe() {
         youAreRef.current!.textContent = `You are ${player}`
 
 
-
-        const parent_window = document.querySelector('#TicTacToe')
-        if (parent_window) {
-            new ResizeObserver((e) => {
-                const data = e[0]
-
-                const width = data.contentRect.width
-                const height = data.contentRect.height
-                if (gameWindowRef.current) {
-                    gameWindowRef.current.style.width = width + 'px'
-                    gameWindowRef.current.style.height = height + 'px'
-                }
-                if (width < 600) {
-                    canvas.width = width - 100
-                }
-                else {
-                    canvas.width = 500
-                }
-                if (height < 600) {
-                    canvas.height = height - 200
-                }
-                else {
-                    canvas.height = 500
-                }
-
-                drawBoard()
-            }).observe(parent_window)
-        }
-
-
-
         // Game Loop
         const gameLoop = () => {            
             if (currentPlayer === AiPlayer) {
@@ -133,7 +102,6 @@ export default function TicTacToe() {
         const AiMove = () => {
             if (gameOver) return
             const bestMove = minimax(board, AiPlayer).index
-            console.log(bestMove);
             
             
             board[bestMove] = AiPlayer
@@ -227,10 +195,11 @@ export default function TicTacToe() {
 
         drawBoard()
 
-
-        setInterval(gameLoop, 1000)
-    })
         
+        setInterval(gameLoop, 1000)
+    });
+
+
 
     return (
         <div
@@ -246,8 +215,8 @@ export default function TicTacToe() {
          
                 <canvas
                     id="tictactoecanvas"
-                    width="600"
-                    height="600"
+                    width="400"
+                    height="400"
                     className="border-4 border-black"
                     ref={canvasRef}
                 ></canvas>
