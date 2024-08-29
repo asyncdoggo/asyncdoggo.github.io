@@ -9,6 +9,8 @@ import Profile from './Profile';
 import Notes from './apps/Notes';
 import user_icon from "./assets/user.svg"
 import user_white from "./assets/user_white.svg"
+import calculator_icon from "./assets/calculator.svg"
+import Calculator from './apps/calculator';
 
 export function updateTaskBar() {
     const taskbarApps = document.getElementById('taskbar_apps')
@@ -101,13 +103,15 @@ function StartMenu() {
         {
             name: "Projects",
             icon: projects_icon,
-            component: <FileManager rootFolderName="Projects"/>
+            component: <FileManager rootFolderName="Projects"/>,
         },
-        // {
-        //     name: "Blogs",
-        //     icon: blogs,
-        //     component: <FileManager rootFolderName="Blogs"/>
-        // },
+       {
+            name: "Calculator",
+            icon: calculator_icon,
+            component: <Calculator />,
+            width: '350px',
+            height: '500px',
+       },
         {
             name: "File Explorer",
             icon: file_manager,
@@ -148,7 +152,7 @@ function StartMenu() {
                     onClick={() => {
                         showStartMenu = false
                         handleRenderStartMenu()
-                        startApplication(item.name, item.icon, item.component)
+                        startApplication(item.name, item.icon, item.component, item.width, item.height)
                     }}
                     >
                         <img src={item.icon} alt={item.name} className="h-8 w-8 invert"/>

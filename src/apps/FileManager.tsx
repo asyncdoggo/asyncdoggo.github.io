@@ -6,6 +6,12 @@ import link_folder_icon from "../assets/link_folder.svg"
 import job_hunter_icon from "../assets/jobhunt.svg"
 import resume_icon from "../assets/resume.svg"
 import back_icon from "../assets/back.svg"
+import tictactoe_icon from "../assets/tictactoe.svg"
+import pong_icon from "../assets/pong.svg"
+import air_hockey_icon from "../assets/air_hockey.svg"
+import TicTacToe from '../games/tictactoe';
+import Pong from '../games/pong';
+import AirHockey from '../games/airhockey';
 
 
 const root = {
@@ -67,6 +73,37 @@ const root = {
                     type: 'link_open',
                     link: "https://www.instagram.com/ayush.arc/",
                     icon: link_folder_icon
+                },
+            ]
+        },
+        {
+            name: "Games",
+            type: 'folder',
+            icon: folder_icon,
+            children: [
+                {
+                    name: "Tic Tac Toe",
+                    type: 'window_open',
+                    icon: tictactoe_icon,
+                    component: <TicTacToe />,
+                    width: '600px', 
+                    height: '600px'
+                },
+                {
+                    name: "Pong",
+                    type: 'window_open',
+                    icon: pong_icon,
+                    component: <Pong />,
+                    width: '800px',
+                    height: '600px'
+                },
+                {
+                    name: "Air Hockey",
+                    type: 'window_open',
+                    icon: air_hockey_icon,
+                    component: <AirHockey />,
+                    width: '600px',
+                    height: '800px'
                 },
             ]
         }
@@ -155,7 +192,7 @@ function FileExplorerGrid ({currentFolder, setCurrentFolder}: any) {
             window.open(child.link, '_blank')
         }
         else if (child.type === 'window_open'){
-            startApplication(child.name, child.icon, child.component)
+            startApplication(child.name, child.icon, child.component, child.width, child.height)
         }
         else if (child.type === 'redirect'){
             window.location.href = child.path
