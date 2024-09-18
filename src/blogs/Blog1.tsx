@@ -50,6 +50,7 @@ export default function Blog1() {
             <div className="flex md:w-2/3 w-full self-center flex-col items-start justify-center">
                 <h1 className="w-full text-4xl font-bold font-sans">Understanding Limits: How Extreme Cases Reveal Surprising Truths</h1>
                 <p className="w-full pt-2 px-2 text-lg font-sans">By me</p>
+                <p className="w-full pt-2 px-2 text-sm font-sans">Published on 12th july 2024</p>
                 <div className="w-full border border-gray-500"></div>
             </div>
 

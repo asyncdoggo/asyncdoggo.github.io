@@ -30,8 +30,8 @@ export default function Desktop() {
 
 
 export function startApplication(
-    appName: string, 
-    appIcon: string, 
+    appName: string,
+    appIcon: string,
     appComponent: JSX.Element,
     width?: string,
     height?: string,
@@ -42,7 +42,7 @@ export function startApplication(
     }
 
     const desktop = document.querySelector('.desktop')
-    if (desktop) {        
+    if (desktop) {
         desktop.appendChild(<Window appName={appName} appIcon={appIcon} appComponent={appComponent} width={width} height={height} />)
         openApps.push({
             name: appName,

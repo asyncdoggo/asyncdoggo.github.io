@@ -1,8 +1,12 @@
-export const openApps: { name: string, icon: string}[] = []
+export const openApps: {
+    name: string,
+    icon: string,
+
+}[] = []
 
 export let currentFocusedApp: string = ""
 
-export const removeCurrentFocusedApp  = () => {
+export const removeCurrentFocusedApp = () => {
     currentFocusedApp = ""
 }
 
@@ -35,7 +39,7 @@ export function toggleMinimizeWindow(id: string) {
 
 export function toggleMaximizeWindow(id: string) {
     const windowElement = document.getElementById(id)!
-    
+
     if (windowElement.style.width === '100%') {
         windowElement.style.width = '400px'
         windowElement.style.height = '400px'

@@ -54,7 +54,7 @@ export default function Profile() {
                 <h2 className="text-lg underline">Email</h2>
                 <p className="text-gray-500">
                     <a href="mailto:ayushdeshpande81@gmail.com">
-                    ayushdeshpande81@gmail.com
+                        ayushdeshpande81@gmail.com
                     </a>
                 </p>
             </div>
@@ -62,11 +62,11 @@ export default function Profile() {
             <div className="Resume mt-4 w-full">
                 <h1 className="text-2xl">Resume</h1>
                 <hr className="w-full" />
-                <button 
-                className="bg-blue-500 px-2 py-2 text-white mt-2 rounded-lg hover:bg-blue-600"
-                onClick={() => {
-                    startApplication('Resume', resume_icon, <IframeWindow src="https://drive.google.com/file/d/1vvJDaZbnTc6ewFNhk3-CrgFdqtXa7Oa7/preview"/>)
-                }}
+                <button
+                    className="bg-blue-500 px-2 py-2 text-white mt-2 rounded-lg hover:bg-blue-600"
+                    onClick={() => {
+                        startApplication('Resume', resume_icon, <IframeWindow src="https://drive.google.com/file/d/1vvJDaZbnTc6ewFNhk3-CrgFdqtXa7Oa7/preview" />)
+                    }}
                 >
                     Open Resume
                 </button>

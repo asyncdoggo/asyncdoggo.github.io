@@ -11,7 +11,7 @@ export default function Pong() {
         const canvas = pongRef.current!
         const ctx = canvas.getContext('2d')!
         let paused_for_menu = true
-        
+
 
         const ball = {
             x: canvas.width / 2,
@@ -62,7 +62,7 @@ export default function Pong() {
             ctx.fill()
         }
 
-        function drawText(text: string, x: number, y: number, color: string, size:number=45) {
+        function drawText(text: string, x: number, y: number, color: string, size: number = 45) {
             ctx.fillStyle = color
             ctx.font = `${size}px fantasy`
             ctx.fillText(text, x, y)
@@ -74,9 +74,9 @@ export default function Pong() {
             }
         }
 
-        function gameLoop(){
+        function gameLoop() {
             render()
-            if(paused_for_menu) return
+            if (paused_for_menu) return
             update()
         }
 
@@ -128,15 +128,15 @@ export default function Pong() {
         }
 
         function collision() {
-            
-            if(ball.x - ball.radius < player.x + player.width && ball.y > player.y - 5 && ball.y < player.y + player.height + 5) {
+
+            if (ball.x - ball.radius < player.x + player.width && ball.y > player.y - 5 && ball.y < player.y + player.height + 5) {
                 return true
             }
-            if(ball.x + ball.radius > opponent.x && ball.y > opponent.y - 5 && ball.y < opponent.y + opponent.height + 5) {
+            if (ball.x + ball.radius > opponent.x && ball.y > opponent.y - 5 && ball.y < opponent.y + opponent.height + 5) {
                 return true
             }
             return false
-            
+
 
         }
 
@@ -153,10 +153,10 @@ export default function Pong() {
                 drawRect(player.x, player.y, player.width, player.height, player.color)
                 drawRect(opponent.x, opponent.y, opponent.width, opponent.height, opponent.color)
                 drawCircle(ball.x, ball.y, ball.radius, ball.color)
-                ctx.filter = 'none'                
+                ctx.filter = 'none'
                 return
             }
-            
+
             drawRect(0, 0, canvas.width, canvas.height, 'BLACK')
             drawText(player.score.toString(), canvas.width / 4, canvas.height / 5, 'WHITE')
             drawText(opponent.score.toString(), 3 * canvas.width / 4, canvas.height / 5, 'WHITE')
@@ -168,41 +168,55 @@ export default function Pong() {
 
         canvas.addEventListener('mousemove', movePaddle)
         function movePaddle(evt: MouseEvent) {
-            if(paused_for_menu) return
+            if (paused_for_menu) return
             let rect = canvas.getBoundingClientRect()
 
             player.y = evt.clientY - rect.top - player.height / 2
         }
 
         canvas.addEventListener('click', () => {
-            if(paused_for_menu) {
+            if (paused_for_menu) {
                 paused_for_menu = false
             }
         })
 
-        window.addEventListener("keydown", (evt) => {
-            if(evt.key === 'p' || evt.key === 'P' || evt.key === 'Escape') {                
+        function keyDown(evt: KeyboardEvent) {
+            if (evt.key === 'p' || evt.key === 'P' || evt.key === 'Escape') {
                 paused_for_menu = !paused_for_menu
             }
-        })
+        }
 
-        // if clicked away from the canvas, pause the game
-        window.addEventListener('blur', () => {
+
+
+        window.addEventListener("keydown", keyDown)
+
+        window.addEventListener('blur', onBlur)
+
+        function onBlur() {
             paused_for_menu = true
-        })
-    
-        setInterval(gameLoop, 1000 / 50)
-    
+        }
+
+        setInterval(gameLoop, 1000 / 50);
+
+        (document.getElementById('Pong_inner')! as any).onCleanUp = () => {
+            window.removeEventListener('keydown', keyDown)
+            canvas.removeEventListener('mousemove', movePaddle)
+            window.removeEventListener('blur', onBlur)
+        }
+
+
     })
 
     return (
-        <div className="pong flex flex-col items-center justify-center">
+        <div className="pong flex flex-col items-center justify-center"
+            id='Pong_inner'
+        >
             <h1 className="text-4xl font-bold">Pong</h1>
-            <div 
-            className="pong-canvas" id="pongCanvas"
+            <div
+                className="pong-canvas" id="pongCanvas"
             >
                 <canvas width="800" height="400"
-                ref={pongRef}
+                    ref={pongRef}
                 ></canvas>
             </div>
         </div>

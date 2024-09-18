@@ -12,6 +12,37 @@ import air_hockey_icon from "../assets/air_hockey.svg"
 import TicTacToe from '../games/tictactoe';
 import Pong from '../games/pong';
 import AirHockey from '../games/airhockey';
+import ImageViewer from './ImageViewer';
+
+
+
+const photos = [
+    {
+        name: "Photo 1",
+        type: 'window_open',
+        icon: folder_icon,
+        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
+        width: '600px',
+        height: '800px'
+    },
+    {
+        name: "Photo 2",
+        type: 'window_open',
+        icon: folder_icon,
+        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
+        width: '600px',
+        height: '800px'
+    },
+    {
+        name: "Photo 3",
+        type: 'window_open',
+        icon: folder_icon,
+        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
+        width: '600px',
+        height: '800px'
+    },
+]
+
 
 
 const root = {
@@ -85,15 +116,16 @@ const root = {
                     name: "Tic Tac Toe",
                     type: 'window_open',
                     icon: tictactoe_icon,
-                    component: <TicTacToe />,
-                    width: '600px', 
+                    // by creating a function, we can ensure that the game is reloaded everytime it is opened, it also saves memory as the component is created only when the function is called
+                    component: () => <TicTacToe />,
+                    width: '600px',
                     height: '600px'
                 },
                 {
                     name: "Pong",
                     type: 'window_open',
                     icon: pong_icon,
-                    component: <Pong />,
+                    component: () => <Pong />,
                     width: '800px',
                     height: '600px'
                 },
@@ -101,25 +133,29 @@ const root = {
                     name: "Air Hockey",
                     type: 'window_open',
                     icon: air_hockey_icon,
-                    component: <AirHockey />,
+                    component: () => <AirHockey />,
                     width: '600px',
                     height: '800px'
                 },
             ]
+        },
+        {
+            name: "Photos",
+            type: 'folder',
+            icon: folder_icon,
+            children: photos
         }
     ]
 }
 
 
-
-
-export default function FileManager({rootFolderName}:any) {
+export default function FileManager({ rootFolderName }: any) {
 
     const titleRef = useRef<HTMLDivElement>(null)
     const fileListRef = useRef<HTMLDivElement>(null)
 
     let currentFolder: any = root
-    if(rootFolderName){
+    if (rootFolderName) {
         currentFolder = root.children.find((child: any) => child.name === rootFolderName)
     }
     if (rootFolderName == "root") {
@@ -129,32 +165,32 @@ export default function FileManager({rootFolderName}:any) {
     function openFolder(folder: any) {
         currentFolder = folder
         const folderName = titleRef.current?.querySelector('h1')
-        if(folderName){
+        if (folderName) {
             folderName.innerHTML = folder.name
         }
         const fileList = fileListRef.current
-        if(fileList){
+        if (fileList) {
             fileList.innerHTML = ""
             fileList.appendChild(<FileExplorerGrid currentFolder={currentFolder} setCurrentFolder={openFolder} />)
         }
     }
-    
+
 
     return (
         <div className="w-full h-full">
             <div className="file-manager bg-white w-full h-full flex flex-col justify-center items-center">
-                <div 
-                className="file-manager-title-bar bg-white p-2 rounded-lg shadow-lg flex justify-start gap-x-4 items-center w-full"
-                ref={titleRef}
+                <div
+                    className="file-manager-title-bar bg-white p-2 rounded-lg shadow-lg flex justify-start gap-x-4 items-center w-full"
+                    ref={titleRef}
                 >
-                    <button 
-                    className="back-button"
-                    onClick={() => {                        
-                        if(currentFolder.name === 'root'){
-                            return
-                        }
-                        openFolder(root)
-                    }}
+                    <button
+                        className="back-button"
+                        onClick={() => {
+                            if (currentFolder.name === 'root') {
+                                return
+                            }
+                            openFolder(root)
+                        }}
                     >
                         <img src={back_icon} alt="back" className="h-4 w-4" />
                     </button>
@@ -163,9 +199,9 @@ export default function FileManager({rootFolderName}:any) {
 
 
 
-                <div 
-                className="file-manager-list flex flex-col w-full gap-y-2 justify-start items-start"
-                ref={fileListRef}
+                <div
+                    className="file-manager-list flex flex-col w-full gap-y-2 justify-start items-start"
+                    ref={fileListRef}
                 >
                     <FileExplorerGrid currentFolder={currentFolder} setCurrentFolder={openFolder} />
                 </div>
@@ -175,49 +211,49 @@ export default function FileManager({rootFolderName}:any) {
 }
 
 
-function FileExplorerGrid ({currentFolder, setCurrentFolder}: any) {
+function FileExplorerGrid({ currentFolder, setCurrentFolder }: any) {
 
-        
-    
+
+
     function openFile(child: any) {
-        if(child.type === 'folder'){
+        if (child.type === 'folder') {
             setCurrentFolder(child)
-        } else if (child.type === 'file'){
+        } else if (child.type === 'file') {
             openFile(child)
         }
-        else if (child.type === 'file_html'){
+        else if (child.type === 'file_html') {
             openHtmlFile(child)
         }
-        else if (child.type === 'link_open'){
+        else if (child.type === 'link_open') {
             window.open(child.link, '_blank')
         }
-        else if (child.type === 'window_open'){
-            startApplication(child.name, child.icon, child.component, child.width, child.height)
+        else if (child.type === 'window_open') {
+            startApplication(child.name, child.icon, child.component(), child.width, child.height)
         }
-        else if (child.type === 'redirect'){
+        else if (child.type === 'redirect') {
             window.location.href = child.path
         }
     }
 
 
     return (
-       <div 
-        className="file-explorer-grid w-full p-2 grid grid-cols-4 gap-4"
-       >
-              {
+        <div
+            className="file-explorer-grid w-full p-2 grid grid-cols-4 gap-4"
+        >
+            {
                 currentFolder.children.map((child: any) => {
                     return (
-                        <div 
-                        className="file-explorer-item flex flex-col items-center justify-center hover:bg-gray-200 rounded-lg px-2 py-2"
-                        onClick={() => openFile(child)}
+                        <div
+                            className="file-explorer-item flex flex-col items-center justify-center hover:bg-gray-200 rounded-lg px-2 py-2"
+                            onClick={() => openFile(child)}
                         >
                             <img src={child.icon} alt="folder" className="h-16 w-16" />
                             <p>{child.name}</p>
                         </div>
                     )
                 })
-              }
-         </div>
+            }
+        </div>
 
     )
 }

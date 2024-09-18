@@ -3,7 +3,37 @@ import React, { useRef } from 'jsx-dom'
 import '@fontsource/gloria-hallelujah';
 import { waitForElement } from '../globals';
 
+export class TicTacToeClass extends React.Component {
+    constructor(props: any) {
+        super(props)
+    }
 
+    componentDidMount() {
+        console.log('componentDidMount');
+
+    }
+
+    render(): React.ReactElement | null {
+        return (
+            <div
+                className="tictactoe flex justify-center items-center p-8 bg-gray-200"
+                style={{ fontFamily: 'Gloria Hallelujah' }}
+            >
+                <div className="flex  flex-col justify-center items-center">
+                    <p className="text-4xl">You are X</p>
+                    <canvas id="tictactoecanvas" width="400" height="400" className="border-4 border-black"></canvas>
+                    {/* elements for showing turns and winner and a reset button */}
+                    <div className="flex flex-col items-center">
+                        <p className="text-4xl">Player X's turn</p>
+                        <p className="text-4xl"></p>
+                        <button className="bg-blue-500 text-white px-4 py-2 mt-4">Reset</button>
+                    </div>
+                </div>
+
+            </div>
+        )
+    }
+}
 
 export default function TicTacToe() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -27,7 +57,7 @@ export default function TicTacToe() {
 
 
         // Game Loop
-        const gameLoop = () => {            
+        const gameLoop = () => {
             if (currentPlayer === AiPlayer) {
                 AiMove()
             }
@@ -36,7 +66,7 @@ export default function TicTacToe() {
         // player move
         canvas.addEventListener('click', (event) => {
             if (gameOver) return
-            if(currentPlayer === AiPlayer) return
+            if (currentPlayer === AiPlayer) return
             const rect = canvas.getBoundingClientRect()
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
@@ -68,11 +98,11 @@ export default function TicTacToe() {
 
 
         const minimax = (board: string[], player: string) => {
-              if (checkWinner()) {
+            if (checkWinner()) {
                 return { score: player === AiPlayer ? -10 : 10, index: -1 }
             }
             if (checkDraw()) {
-                return { score: 0 , index: -1 }
+                return { score: 0, index: -1 }
             }
 
             let bestMove = -1
@@ -98,12 +128,12 @@ export default function TicTacToe() {
             return { score: bestScore, index: bestMove }
         }
 
-        
+
         const AiMove = () => {
             if (gameOver) return
             const bestMove = minimax(board, AiPlayer).index
-            
-            
+
+
             board[bestMove] = AiPlayer
             currentPlayer = player
             playerTurnRef.current!.textContent = `Player ${currentPlayer}'s turn`
@@ -195,7 +225,7 @@ export default function TicTacToe() {
 
         drawBoard()
 
-        
+
         setInterval(gameLoop, 1000)
     });
 
@@ -206,13 +236,14 @@ export default function TicTacToe() {
             className="tictactoe flex justify-center items-center p-8 bg-gray-200"
             style={{ fontFamily: 'Gloria Hallelujah' }}
             ref={gameWindowRef}
+            id='tictactoe_inner'
         >
             <div className="flex  flex-col justify-center items-center">
                 <p
                     ref={youAreRef}
                     className="text-4xl"
                 ></p>
-         
+
                 <canvas
                     id="tictactoecanvas"
                     width="400"

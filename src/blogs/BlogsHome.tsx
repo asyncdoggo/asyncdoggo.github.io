@@ -1,16 +1,61 @@
 import React from 'jsx-dom';
+import back_btn from '../assets/back.svg';
 
 export default function BlogsHome() {
     return (
-        <div>
-            <h1 className="text-4xl font-bold">Blogs</h1>
-            <div className="flex flex-col">
-                <a href="/blogs/1" className="hover:underline">Blog 1</a>
-                <a href="/blogs/2" className="hover:underline">Blog 2</a>
-                <a href="/blogs/3" className="hover:underline">Blog 3</a>
-                <a href="/blogs/4" className="hover:underline">Blog 4</a>
-                <a href="/blogs/5" className="hover:underline">Blog 5</a>
+        <>
+            <div className="navbar bg-gray-800 text-white p-4">
+                <a href="/" className="text-white">
+                    <img src={back_btn} alt="back" className="w-6 h-6 invert" />
+                </a>
             </div>
-        </div>
+
+            <div className="container mx-auto p-4">
+                <h1 className="text-3xl font-bold">Blogs</h1>
+                <div className="flex flex-col gap-4 mt-4">
+                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {window.location.href = '/blogs/limits'}}
+                    >
+                        <h2 className="text-xl font-bold">Limits</h2>
+                        <p>
+                           This blog talks about the mathematical concept of limits and how it can be visualized using intuituve examples.
+                        </p>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-4 mt-4">
+                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {window.location.href = '/blogs/python/intro'}}
+                    >
+                        <h2 className="text-xl font-bold">Python Introduction</h2>
+                        <p>
+                            An introduction to Python programming language. The first blog in the Python series.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-4 mt-4">
+                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {window.location.href = '/blogs/python/2'}}
+                    >
+                        <h2 className="text-xl font-bold">Python Aspects</h2>
+                        <p>
+                            A deep dive into the aspects of Python programming language. The second blog in the Python series.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-4 mt-4">
+                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {window.location.href = '/blogs/python/3'}}
+                    >
+                        <h2 className="text-xl font-bold">Python Basics</h2>
+                        <p>
+                            The basics of Python programming language. The third blog in the Python series.
+                        </p>
+                    </div>
+                </div>                
+
+            </div>
+        </>
     )
 }
