@@ -8,7 +8,8 @@ const blogs = [
     "/blogs/limits",
     "/blogs/python/intro",
     "/blogs/python/2",
-    "/blogs/python/3"
+    "/blogs/python/3",
+    "/blogs/refraction"
 ]
 
 
@@ -16,7 +17,6 @@ window.addEventListener('load', () => {
     if (window.location.pathname.startsWith('/blogs')) {
         // Get the blog number from the url
         const blogName = window.location.pathname.split('/').slice(2).join('/')
-        console.log(blogName);
         
         if (blogName === "") {
             document.body.appendChild(<BlogsHome />)

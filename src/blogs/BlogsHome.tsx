@@ -24,6 +24,16 @@ export default function BlogsHome() {
                 </div>
                 <div className="flex flex-col gap-4 mt-4">
                     <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {window.location.href = '/blogs/refraction'}}
+                    >
+                        <h2 className="text-xl font-bold">Refraction</h2>
+                        <p>
+                            This blog talks about the concept of refraction and speed of light.
+                        </p>
+                    </div>
+                </div>            
+                <div className="flex flex-col gap-4 mt-4">
+                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer hover:bg-gray-50"
                     onClick={() => {window.location.href = '/blogs/python/intro'}}
                     >
                         <h2 className="text-xl font-bold">Python Introduction</h2>
@@ -53,7 +63,8 @@ export default function BlogsHome() {
                             The basics of Python programming language. The third blog in the Python series.
                         </p>
                     </div>
-                </div>                
+                </div>    
+
 
             </div>
         </>

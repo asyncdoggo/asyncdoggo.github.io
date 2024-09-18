@@ -1,17 +1,17 @@
 import React from 'jsx-dom';
-import Blog1 from './Blog1';
+import Limits from './limits';
 import PythonIntro from './python/pythonIntro';
 import Python2 from './python/pythonAspects';
 import BlogsHome from './BlogsHome';
 import Python3 from './python/pythonBasics';
+import Refraction from './refraction';
 
 
 export default function BlogRouter({blogName}: any) {
-    console.log(blogName);
     
     if(blogName == "limits"){
         return (
-            <Blog1/>
+            <Limits />
         )
     }
     if (blogName == "python/intro"){
@@ -29,6 +29,12 @@ export default function BlogRouter({blogName}: any) {
             <Python3/>
         )
     }
+    if (blogName == "refraction"){
+        return (
+            <Refraction/>
+        )
+    }
+
     return (
         <BlogsHome/>
     )

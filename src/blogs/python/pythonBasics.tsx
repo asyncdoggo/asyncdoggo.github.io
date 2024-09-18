@@ -11,6 +11,7 @@ export default function Python3() {
             <div className="flex md:w-2/3 w-full self-center flex-col items-start justify-center">
                 <h1 className="w-full text-4xl font-bold font-sans">What is Python and How does it work?</h1>
                 <p className="w-full pt-2 px-2 text-lg font-sans">By me</p>
+                <p className="w-full pt-2 px-2 text-sm font-sans">Published on 16th september 2024</p>
                 <div className="w-full border border-gray-500"></div>
             </div>
 

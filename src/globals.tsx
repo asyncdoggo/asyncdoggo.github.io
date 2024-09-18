@@ -66,3 +66,14 @@ export function waitForElement(selector: string, callback: any) {
         }, 100);
     }
 }
+
+
+
+export const waitForElementFromRef = (ref:any, callback:any) => {
+    const interval = setInterval(() => {        
+        if (ref.current) {
+            clearInterval(interval);
+            callback();
+        }
+    }, 100);
+};

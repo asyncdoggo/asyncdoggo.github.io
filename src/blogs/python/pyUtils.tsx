@@ -5,16 +5,7 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { indentOnInput, indentUnit } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { python } from "@codemirror/lang-python";
-
-
-export const waitForElementFromRef = (ref:any, callback:any) => {
-    const interval = setInterval(() => {        
-        if (ref.current) {
-            clearInterval(interval);
-            callback();
-        }
-    }, 100);
-};
+import { waitForElementFromRef } from "../../globals";
 
 declare const loadPyodide: any;
 
@@ -26,7 +17,7 @@ export function getPyodide() {
     });
 }
 
-getPyodide();
+// getPyodide();
 
 export function InlineCode({code}:any) {
     return (
