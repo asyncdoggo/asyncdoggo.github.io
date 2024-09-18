@@ -7,6 +7,8 @@ import Python3 from './python/pythonBasics';
 
 
 export default function BlogRouter({blogName}: any) {
+    console.log(blogName);
+    
     if(blogName == "limits"){
         return (
             <Blog1/>

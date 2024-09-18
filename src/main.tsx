@@ -1,8 +1,8 @@
 import React from "jsx-dom"
 import Desktop from "./desktop"
-import BlogsHome from "./blogs/BlogsHome"
 import BlogRouter from "./blogs/BlogsRouter"
 import "./index.css"
+import BlogsHome from "./blogs/BlogsHome"
 
 const blogs = [
     "/blogs/limits",
@@ -18,8 +18,18 @@ window.addEventListener('load', () => {
         const blogName = window.location.pathname.split('/').slice(2).join('/')
         console.log(blogName);
         
-       
+        if (blogName === "") {
+            document.body.appendChild(<BlogsHome />)
+        }
+
+
+        if (blogs.includes(`/blogs/${blogName}`)) {
+            console.log("Blog found");
+            
             document.body.appendChild(<BlogRouter blogName={blogName} />)
+        }
+        
+        
     } else {
         document.body.appendChild(<Desktop />)
     }

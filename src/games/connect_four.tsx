@@ -1,7 +1,5 @@
 import React, { useRef } from "jsx-dom"
 import { waitForElement } from "../globals"
-import { log } from "console"
-
 
 
 export default function ConnectFour() {
@@ -19,7 +17,7 @@ export default function ConnectFour() {
 
         const board = Array.from({ length: 6 }, () => Array(7).fill(0))
         let currentPlayer = 1
-        let winner = 0
+        // let winner = 0
         let gameOver = false
 
         const drawBoard = () => {
@@ -73,7 +71,7 @@ export default function ConnectFour() {
                 if (board[row][col] === 0) {
                     board[row][col] = currentPlayer
                     if (checkWinner(row, col)) {
-                        winner = currentPlayer
+                        // winner = currentPlayer
                         gameOver = true
                     } else {
                         currentPlayer = currentPlayer === 1 ? 2 : 1

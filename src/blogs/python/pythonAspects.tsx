@@ -1,16 +1,6 @@
 import React from "jsx-dom";
 
-declare const loadPyodide: any;
-
 export default function Python2() {
-
-
-    let pyodide: null = null
-
-    // loadPyodide().then((py: any) => {
-    //     pyodide = py
-    // })
-
 
     return (
         <div
