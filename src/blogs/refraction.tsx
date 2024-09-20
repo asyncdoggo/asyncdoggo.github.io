@@ -72,7 +72,7 @@ export default function Refraction() {
                         Reflection and refraction are always seen together. If you pass light at a steep angle, it will be reflected. If you pass light at a shallow angle, it will be refracted.
                     </p>
 
-                    <p className="w-full italic pt-4 text-lg font-sans">
+                    <p className="w-full font-medium pt-4 text-2xl font-sans">
                         Refractive index
                     </p>
 
@@ -92,10 +92,7 @@ export default function Refraction() {
                         How is it measured? The refractive index of a medium is measured by passing light through the medium and measuring the angle of refraction.
                     </p>
 
-                    {/* Equation */}
-                    <p className="w-full pt-4 text-lg font-sans">
-                        The equation for refractive index is:
-                    </p>
+                   
                     <p className="w-full pt-4 text-lg font-sans">
                         The relative refractive index of an optical medium 2 with respect to medium 1 is given by the formula:
                     </p>
@@ -129,34 +126,35 @@ export default function Refraction() {
                         {"`n prop 1/v`"}
                     </p>
 
+                    <p className="w-full pt-4 text-lg font-sans">
+                        And by applying the <a href="https://en.wikipedia.org/wiki/Snell%27s_law" className="text-blue-500">Snell's Law</a>.
+                    </p>
+                    <p className="w-full pt-4 text-lg font-sans">
+                        {"`n_1 sin(theta_1) = n_2 sin(theta_2)`"}
+                    </p>
+                    <p className="w-full pt-4 text-lg font-sans">
+                        where {"`n_1`"} and {"`n_2`"} are the refractive indices of the two mediums and {"`theta_1`"} and {"`theta_2`"} are the angles of incidence and refraction respectively.
+                    </p>
+
+                    <p className="w-full pt-4 text-lg font-sans">
+                        Therefore we can say that:
+                    </p>
+                    <p className="w-full pt-4 text-lg font-sans">
+                        {"`sin(theta_1)/sin(theta_2) = n_2/n_1 = v_1/v_2`"}
+                    </p>
+
 
 
                     <p className="w-full pt-4 text-lg font-sans">
                         That's cool and all, but lets now talk about the question we all have.
                     </p>
-                    <p className="w-full pt-4 text-lg font-sans">
-                        <i>Why does light change speed and direction?</i>
+                    <p className="w-full pt-4 text-2xl font-medium font-sans">
+                        Why does light change speed and direction?
                     </p>
-                    <p className="w-full pt-4 text-lg font-sans">
+                    <p className="w-full pt-4 text-xl font-sans">
                         First lets talk about the direction.
                     </p>
-                    <p className="w-full pt-4 text-lg font-sans">
-                        Light is an electromagnetic wave. When it enters a medium, the atoms in the medium starts oscillating. These oscillations cause the electromagnetic interference which ends up changing the direction of the light.
-                    </p>
-
-                    <p className="w-full pt-4 text-lg font-sans">
-                        The change in direction depends on the refractive index of the medium. The higher the refractive index of the material,
-                        the more the light is bent.
-                    </p>
-
-                    <p className="w-full pt-4 text-lg font-sans">
-                        Now lets talk about the speed.
-                    </p>
-
-                    <p className="w-full pt-4 text-lg font-sans">
-                        The change in speed is an interesting phenomenon.
-                    </p>
-
+                    
                     <p className="w-full pt-4 text-lg font-sans">
                         If you notice, refraction occurs when light is incident at an angle. Since light is a wave, when it comes at an angle, the wavefronts are not perpendicular to the surface of the medium.
                     </p>
@@ -166,7 +164,23 @@ export default function Refraction() {
                     </p>
 
                     <p className="w-full pt-4 text-lg font-sans">
-                        The phase change causes the wavefront to slow down. This is why light slows down when it enters a medium.
+                        The phase change causes the wavefront to slow down. This causes the wavefront to change direction. 
+                    </p>
+
+
+
+                    <p className="w-full pt-4 text-xl font-sans">
+                        Now lets talk about the speed.
+                    </p>
+
+                    <p className="w-full pt-4 text-lg font-sans">
+                    The change in direction depends on the refractive index of the medium. The higher the refractive index of the material,
+                        the more the light is bent.
+                    </p>
+
+                    <p className="w-full pt-4 text-lg font-sans">
+                        Light is an electromagnetic wave. When it enters a medium, the atoms in the medium starts oscillating. These oscillations cause the electromagnetic interference which ends up slowing down the light.
+
                     </p>
 
                     <p className="w-full pt-4 text-lg font-sans">
@@ -197,7 +211,7 @@ function StaticRefractionCanvas() {
 
     waitForElementFromRef(canvasRef, () => {
         const canvas = canvasRef.current!
-        canvas.width = 700
+        canvas.width = 600
         canvas.height = 500
         const ctx = canvas.getContext('2d')!
         let incidentLineEndY = canvas.height / 2
@@ -223,6 +237,9 @@ function StaticRefractionCanvas() {
 
             const endX = canvas.width / 2 - 50
             const endY = incidentLineEndY
+
+            ctx.lineWidth = 2
+
             ctx.beginPath()
             ctx.moveTo(startX, startY)
             ctx.strokeStyle = "black"
@@ -289,11 +306,7 @@ function StaticRefractionCanvas() {
 
 
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth
-            if (window.innerWidth > 700) {
-                canvas.width = 700
-            }
-
+            canvas.width = 600
             canvas.height = 500
         })
 
