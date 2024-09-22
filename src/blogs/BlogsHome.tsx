@@ -1,15 +1,8 @@
 import React from 'jsx-dom';
-import back_btn from '../assets/back.svg';
 
 export default function BlogsHome() {
     return (
         <>
-            <div className="navbar bg-gray-800 text-white p-4">
-                <a href="/" className="text-white">
-                    <img src={back_btn} alt="back" className="w-6 h-6 invert" />
-                </a>
-            </div>
-
             <div className="container mx-auto p-4">
                 <h1 className="text-3xl font-bold">Blogs</h1>
                 <div className="flex flex-col gap-4 mt-4">

@@ -45,7 +45,7 @@ const photos = [
 
 
 
-const root = {
+export const root = {
     name: 'root',
     type: 'folder',
     icon: folder_icon,
@@ -147,7 +147,6 @@ const root = {
         }
     ]
 }
-
 
 export default function FileManager({ rootFolderName }: any) {
 

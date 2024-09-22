@@ -8,7 +8,7 @@ import user_icon from "./assets/user.svg"
 export default function Profile() {
     return (
 
-        <div className="profile bg-white w-full h-screen flex flex-col justify-start items-start">
+        <div className="profile bg-white w-full h-screen flex flex-col justify-start items-start pl-4">
             <div className="profile-header flex gap-x-4 justify-start items-center">
                 <div className="profile-image">
                     <img src={user_icon} alt="user" className="h-12 w-12" />
