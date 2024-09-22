@@ -17,7 +17,7 @@ export function getPyodide() {
     });
 }
 
-// getPyodide();
+getPyodide();
 
 export function InlineCode({code}:any) {
     return (
