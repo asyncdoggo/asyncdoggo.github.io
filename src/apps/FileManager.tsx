@@ -12,36 +12,7 @@ import air_hockey_icon from "../assets/air_hockey.svg"
 import TicTacToe from '../games/tictactoe';
 import Pong from '../games/pong';
 import AirHockey from '../games/airhockey';
-import ImageViewer from './ImageViewer';
-
-
-
-const photos = [
-    {
-        name: "Photo 1",
-        type: 'window_open',
-        icon: folder_icon,
-        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
-        width: '600px',
-        height: '800px'
-    },
-    {
-        name: "Photo 2",
-        type: 'window_open',
-        icon: folder_icon,
-        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
-        width: '600px',
-        height: '800px'
-    },
-    {
-        name: "Photo 3",
-        type: 'window_open',
-        icon: folder_icon,
-        component: () => <ImageViewer src="https://images.unsplash.com/photo-1632095460683-3f6b7b9b5d7b" />,
-        width: '600px',
-        height: '800px'
-    },
-]
+import ImageViewer, { images } from './ImageViewer';
 
 
 
@@ -143,7 +114,7 @@ export const root = {
             name: "Photos",
             type: 'folder',
             icon: folder_icon,
-            children: photos
+            children: images
         }
     ]
 }
@@ -231,6 +202,9 @@ function FileExplorerGrid({ currentFolder, setCurrentFolder }: any) {
         }
         else if (child.type === 'redirect') {
             window.location.href = child.path
+        }
+        else if (child.type === 'photo') {
+            startApplication("ImageViewer", child.icon, <ImageViewer id={images.indexOf(child)} />)
         }
     }
 
