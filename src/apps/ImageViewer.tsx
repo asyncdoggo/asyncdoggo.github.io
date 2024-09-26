@@ -93,15 +93,34 @@ export const images = [
 
 export default function ImageViewer({id}:any) {
     let current = id
+    const loading = useRef(false)
     const imageRef = useRef<HTMLImageElement>(null)
 
-    let loading = false
+    const previous = () => {
+        if (current > 1) {
+            current -= 1
+            imageRef.current?.setAttribute('src', images[current].image||"")
+            loading.current = true  
+            imageRef.current!.style.opacity = "0"
+            document.getElementById('loading')!.style.display = "block"                      
+        }
+    }
+
+    const next = () => {
+        if (current < images.length - 1) {
+            current += 1
+            imageRef.current?.setAttribute('src', images[current].image||"")     
+            loading.current = true               
+            imageRef.current!.style.opacity = "0"   
+            document.getElementById('loading')!.style.display = "block" 
+        }
+    }
 
 
     waitForElementFromRef(imageRef, () => {
         
         imageRef.current?.addEventListener('load', () => {
-            loading = false
+            loading.current = false
             imageRef.current!.style.opacity = "1"
             document.getElementById('loading')!.style.display = "none"
         })
@@ -111,24 +130,8 @@ export default function ImageViewer({id}:any) {
         <div className="flex flex-col items-center justify-center h-full mt-10 select-none">
             <img src={images[current].image} alt="image" ref={imageRef} />
             <div className="flex gap-x-4 mt-4">
-                <button className="bg-gray-800 text-white p-2 rounded-lg" onClick={() => {
-                    if (current > 1) {
-                        current -= 1
-                        imageRef.current?.setAttribute('src', images[current].image||"")
-                        loading = true  
-                        imageRef.current!.style.opacity = "0"
-                        document.getElementById('loading')!.style.display = "block"                      
-                    }
-                }}>Previous</button>
-                <button className="bg-gray-800 text-white p-2 rounded-lg" onClick={() => {
-                    if (current < images.length - 1) {
-                        current += 1
-                        imageRef.current?.setAttribute('src', images[current].image||"")     
-                        loading = true               
-                        imageRef.current!.style.opacity = "0"   
-                        document.getElementById('loading')!.style.display = "block" 
-                    }
-                }}>Next</button>
+                <button className="bg-gray-800 text-white p-2 rounded-lg" onClick={previous}>Previous</button>
+                <button className="bg-gray-800 text-white p-2 rounded-lg" onClick={next}>Next</button>
                 
                     <div role="status" id='loading'>
                         <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
