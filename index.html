@@ -2,18 +2,59 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vin</title>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
-  <link type="module" rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
-  <script type="module" src="node_modules/@xterm/xterm/lib/xterm.js"></script>
   <style>
      .cm-editor {
             height: 100%;
             width: 100%;
         }
   </style>
+  <style>
+    .terminal {
+      --size: 1.5;
+      --color: rgba(255, 255, 255, 0.8);
+    }
+    .noblink {
+      --animation: terminal-none;
+    }
+    body {
+      background-color: black;
+    }
+    #jquery-terminal-logo {
+      color: white;
+      border-color: white;
+      position: absolute;
+      top: 7px;
+      right: 18px;
+      z-index: 2;
+    }
+    #jquery-terminal-logo a {
+      color: gray;
+      text-decoration: none;
+      font-size: 0.7em;
+    }
+    #loading {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      border: 3px solid rgba(172, 237, 255, 0.5);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      -webkit-animation: spin 1s ease-in-out infinite;
+    }
+    </style>
+    <script defer data-domain="pyodide.org" src="https://plausible.io/js/plausible.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/jquery.terminal@2.x.x/js/jquery.terminal.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/jquery.terminal@2.x.x/css/jquery.terminal.min.css"/>
+
 </head>
 <script type="text/javascript">
   window.MathJax = {

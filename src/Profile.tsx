@@ -1,4 +1,4 @@
-import React from 'jsx-dom';
+import * as React from 'jsx-dom';
 import { startApplication } from './desktop';
 import IframeWindow from './IframeWindow';
 import resume_icon from "./assets/file_manager.svg"

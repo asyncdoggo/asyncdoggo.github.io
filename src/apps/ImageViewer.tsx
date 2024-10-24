@@ -1,4 +1,5 @@
-import React, { useRef } from 'jsx-dom'
+import * as React from "jsx-dom"
+import { useRef } from 'jsx-dom'
 import photo1 from "../assets/gallery/1.png"
 import photo2 from "../assets/gallery/2.png"
 import photo3 from "../assets/gallery/3.png"

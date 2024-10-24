@@ -1,4 +1,5 @@
-import React, { useRef } from 'jsx-dom'
+import { useRef } from 'jsx-dom'
+import * as React from 'jsx-dom'
 
 import '@fontsource/gloria-hallelujah';
 import { waitForElement } from '../globals';

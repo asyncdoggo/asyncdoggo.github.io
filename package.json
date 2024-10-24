@@ -26,9 +26,7 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.33.0",
     "@fontsource/gloria-hallelujah": "^5.0.20",
-    "@xterm/addon-canvas": "^0.7.0",
-    "@xterm/addon-fit": "^0.10.0",
-    "@xterm/xterm": "^5.5.0",
+    "jquery.terminal": "^2.44.1",
     "jsx-dom": "^8.1.4",
     "mathjs": "^13.1.1"
   }

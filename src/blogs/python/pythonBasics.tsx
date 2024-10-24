@@ -1,4 +1,4 @@
-import React from "jsx-dom";
+import * as React from "jsx-dom";
 import { CodeExecutionBlock, InlineCode } from "./pyUtils";
 
 export default function Python3() {

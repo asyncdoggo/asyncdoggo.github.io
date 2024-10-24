@@ -1,4 +1,5 @@
-import React, { useRef } from 'jsx-dom';
+import * as React from "jsx-dom"
+import { useRef } from 'jsx-dom';
 import { startApplication } from '../desktop';
 import IframeWindow from '../IframeWindow';
 import folder_icon from "../assets/folder.svg"

@@ -1,12 +1,12 @@
-import React, { JSX } from 'jsx-dom';
+import * as React from "jsx-dom";
 import Taskbar, { updateTaskBar } from './taskbar';
 import { openApps } from './globals';
 import Window from './windowElement';
 import file_manager_icon from "./assets/file_manager.svg"
 import FileManager from './apps/FileManager';
 import games_icon from './assets/games.svg';
-import terminal from './assets/terminal.svg';
-import TerminalApp from './apps/Terminal';
+import python from './assets/python.svg';
+import PythonREPL from "./apps/Python";
 
 export default function Desktop() {
     return (
@@ -23,11 +23,10 @@ export default function Desktop() {
                     <p className="text-white">Games</p>
                 </button>
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Terminal', terminal, <TerminalApp />, "600", "600")}>
-                    <img src={terminal} alt="Terminal" className="h-16 w-16" />
-                    <p className="text-white">Terminal</p>
+                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Python', python, <PythonREPL />, "700px", "450px")}>
+                    <img src={python} alt="Python" className="h-16 w-16" />
+                    <p className="text-white">Python</p>
                 </button>
-
 
             </div>
             <Taskbar />
@@ -39,7 +38,7 @@ export default function Desktop() {
 export function startApplication(
     appName: string,
     appIcon: string,
-    appComponent: JSX.Element,
+    appComponent: React.JSX.Element,
     width?: string,
     height?: string,
 ) {

@@ -1,4 +1,4 @@
-import React from 'jsx-dom';
+import * as React from 'jsx-dom';
 
 export default function BlogsHome() {
     return (

@@ -1,5 +1,5 @@
-import React, { JSX } from "jsx-dom"
-import { useRef } from "jsx-dom"
+import * as React from "jsx-dom"
+import { JSX, useRef } from "jsx-dom"
 import { currentFocusedApp, openApps, removeCurrentFocusedApp, setCurrentFocusedApp, toggleMaximizeWindow, toggleMinimizeWindow } from "./globals"
 import { updateTaskBar } from "./taskbar"
 import maximize from "./assets/maximize.svg"

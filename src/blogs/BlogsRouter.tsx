@@ -1,4 +1,4 @@
-import React from 'jsx-dom';
+import * as React from 'jsx-dom';
 import Limits from './limits';
 import PythonIntro from './python/pythonIntro';
 import Python2 from './python/pythonAspects';

@@ -1,4 +1,5 @@
-import React, { useRef } from "jsx-dom";
+import * as React from "jsx-dom";
+import { useRef } from "jsx-dom";
 import { crosshairCursor, drawSelection, EditorView, highlightActiveLineGutter, highlightSpecialChars, keymap, lineNumbers, rectangularSelection } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
@@ -6,18 +7,8 @@ import { indentOnInput, indentUnit } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { python } from "@codemirror/lang-python";
 import { waitForElementFromRef } from "../../globals";
+import {asyncRun} from "./workerApi";
 
-declare const loadPyodide: any;
-
-export let pyodide: any;
-
-export function getPyodide() {
-    loadPyodide().then((py: any) => {
-        pyodide = py
-    });
-}
-
-getPyodide();
 
 export function InlineCode({code}:any) {
     return (
@@ -85,15 +76,13 @@ export function CodeExecutionBlock({ expectedOutput }: { expectedOutput: any }) 
     })
     let pyVariables: any = {};
 
-    const runCode = () => {
-        if (pyodide === null) return
+    const runCode = async () => {
         try {
             const codeToRun = view.state.doc.toString();
-            pyodideStdout = "";
-            pyodide.setStdout({ batched: (msg: any) => { pyodideStdout += `${msg}\n` } });
-            pyodide.runPython(codeToRun);
-            outputBlock.current!.innerHTML = pyodideStdout;
-            pyVariables = pyodide.globals.toJs();           
+            const { result, error, pyVariables: pyvars } = await asyncRun(codeToRun, {}, false);
+            outputBlock.current!.innerHTML = result || error;            
+            pyodideStdout = result || error;
+            pyVariables = pyvars;
         }
         catch (e:any) {
             outputBlock.current!.innerHTML = e;
@@ -161,3 +150,52 @@ export function CodeExecutionBlock({ expectedOutput }: { expectedOutput: any }) 
         </div>
     );
 }
+
+
+// const context1 = {};
+
+
+// const expectedResult1 = {
+//     result: "Today is a good day!\n",
+//     error: null,
+//     pyVariables: null
+// }
+
+
+
+
+//     const { result, error, pyVariables } = 
+
+//     if (error) {
+//         document.getElementById("result_1").innerText = error;
+//     } else {
+//         document.getElementById("result_1").innerText = result;
+//     }
+
+//     if (expectedResult1.pyVariables) {
+
+//         const pyVariablesCondition = Object.keys(expectedResult1.pyVariables).every(key => {
+//             return expectedResult1.pyVariables[key] === pyVariables[key];
+//         });
+//     }
+
+//     console.log(expectedResult1.result, result,
+//         expectedResult1.result == result,
+//     );
+
+
+//     if (
+//         expectedResult1.result == result &&
+//         expectedResult1.error == error
+//         // pyVariablesCondition
+//     ) {
+//         document.getElementById("err_result_1").innerHTML = "✔️ Great job!";
+//         document.getElementById("err_result_1").style.color = "green";
+//     } else {
+//         document.getElementById("err_result_1").innerHTML = "❌ Try again! The output is not as expected.";
+//         document.getElementById("err_result_1").style.color = "red";
+//     }
+
+
+//     document.getElementById("run_1").disabled = false;
+// });

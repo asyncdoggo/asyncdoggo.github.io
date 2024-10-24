@@ -1,8 +1,8 @@
-import React, { useRef } from "jsx-dom";
+import * as React from "jsx-dom";
+import { useRef } from "jsx-dom";
 
 export default function Notes({content}: any) {
     const notesRef = useRef<HTMLTextAreaElement>(null)
-console.log(content);
 
     return (
         <div

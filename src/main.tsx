@@ -1,4 +1,5 @@
-import React, { useText } from "jsx-dom"
+import { useText } from "jsx-dom"
+import * as React from "jsx-dom"
 import Desktop from "./desktop"
 import BlogRouter from "./blogs/BlogsRouter"
 import "./index.css"
