@@ -5,20 +5,36 @@ export let progress = {progress: 0, text: "", timeElapsed: 0}
 
 const initProgressCallback = (initProgress: any) => {
     progress = initProgress;
+    console.log(progress);
+    
   }
 
 const engine = new MLCEngine(
 { initProgressCallback: initProgressCallback }, // engineConfig
 );
- 
+
+engine.getInitProgressCallback
+
 export const availableModels = [
   {
     name: "SmolLM-360M-Instruct-q0f16-MLC",
-    notes: "tiny, fast, and good for testing, incoherent responses. WILL NOT LOAD IN INCOGNITO MODE.",
+    notes: "tiny, fast, and good for testing, incoherent responses.",
+  },
+  {
+    name: "Qwen2.5-0.5B-Instruct-q4f16_1-MLC",
+    notes: "kinda larger, slower, slightly smart.",
+  },
+  {
+    name: "gemma-2b-it-q4f16_1-MLC",
+    notes: "kinda larger. This guy talks using emojis lmao.",
   },
   {
     name: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-    notes: "large, slower, smart enough. WILL NOT LOAD IN INCOGNITO MODE.",
+    notes: "small but smart.",
+  },
+  {
+    name: "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC",
+    notes: "larger, slower, smart enough.",
   }
 ]
 
@@ -41,9 +57,7 @@ export async function init(index: number) {
     }
 }
 
-export async function completion(message: any){
-    console.log("Sending message to engine", message);
-    
+export async function completion(message: any){    
     const reply = await engine.chat.completions.create({
         messages: message,
     });

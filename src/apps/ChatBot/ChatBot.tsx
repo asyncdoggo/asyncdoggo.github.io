@@ -14,6 +14,7 @@ export default function ChatBot() {
 
     let generating = false;
     let initialized = false;
+    let selectedIndex = 0;
 
     let prompt = "USER: ";
     waitForElement('#terminal_chatbot', () => {
@@ -21,6 +22,7 @@ export default function ChatBot() {
             $('#terminal_chatbot').terminal(async function (command: string, term: any) {
                 if(!initialized){
                     const index = parseInt(command);
+                    selectedIndex = index;
                     const success = await init(index - 1);
                     if (!success) {
                         term.error("You did not enter a valid model number. I hope you know what a number is.");
@@ -29,14 +31,14 @@ export default function ChatBot() {
                     }
                 }
 
-                if (progress.progress < 1) {
+                if (progress.progress < 1 || !progress.text.startsWith("Finish")) {
                     initialized = true;
                     asyncCaller(() => {
                         term.pause()
                         term.update(term.last_index(), `Loading model: ${progress.text}`)
                         if (progress.progress === 1) {
                             term.clear();
-                            term.echo(`Model loaded successfully!\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
+                            term.echo(`Model loaded successfully!\nSelected Model: ${availableModels[selectedIndex - 1].name}\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
                             term.resume()
                         }
                     });
@@ -58,10 +60,10 @@ export default function ChatBot() {
                 else if (command === "clear") {
                     term.clear();
                     resetChat();
-                    term.echo(`Chat cleared.\nUse "unload" to load a new model.\n"q" to interrupt generation.\n"clear" to reset the chat.`);
+                    term.echo(`Chat cleared.\nSelected model ${availableModels[selectedIndex - 1].name}\nUse "unload" to load a new model.\n"q" to interrupt generation.\n"clear" to reset the chat.`);
                     term.resume();
                 }
-                else if(progress.progress === 1){
+                else if(progress.progress === 1 && progress.text.startsWith("Finish")){
                     try {
                         if (command.trim() === "") {
                             term.resume();
@@ -78,7 +80,7 @@ export default function ChatBot() {
                         for await (const chunk of chunks) {
                             reply += chunk.choices[0]?.delta.content || "";
                             if (chunk.usage) {
-                            console.log(chunk.usage); // only last chunk has usage
+                            // console.log(chunk.usage); // only last chunk has usage
                             }
                             term.update(term.last_index(), reply);
                         }
@@ -93,7 +95,7 @@ export default function ChatBot() {
                     }
                 }
             }, {
-                greetings: `Welcome to the Chat BOT!\nHere are the list of available models to load:\n` + availableModels.map((model, index) => {return `${index + 1}. ${model.name} - ${model.notes}`}).join("\n") + `\nType the number of the model you want to load and press enter.`,
+                greetings: `Welcome to the Chat BOT!\nHere are the list of available models to load:\n` + availableModels.map((model, index) => {return `${index + 1}. ${model.name} - ${model.notes}`}).join("\n") + `\nNOTE: WILL NOT LOAD IN INCOGNITO MODE\nType the number of the model you want to load and press enter.`,
                 name: 'Chat BOT',
                 prompt: prompt,
                 height: 400,
