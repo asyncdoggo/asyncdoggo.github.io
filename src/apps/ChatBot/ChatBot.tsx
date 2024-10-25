@@ -30,16 +30,16 @@ export default function ChatBot() {
                 }
 
                 if (progress.progress < 1) {
-                    // term.pause();
                     initialized = true;
                     asyncCaller(() => {
+                        term.pause()
                         term.update(term.last_index(), `Loading model: ${progress.text}`)
                         if (progress.progress === 1) {
                             term.clear();
                             term.echo(`Model loaded successfully!\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
+                            term.resume()
                         }
                     });
-                    
                 }
 
                 if (command === "unload") {
