@@ -1,4 +1,3 @@
-// webworker.mjs
 import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.mjs";
 
 let pyodideReadyPromise = loadPyodide();
@@ -15,6 +14,7 @@ self.onmessage = async (event) => {
   // configure stdout
   pyodideStdout = "";
   pyodide.setStdout({ batched: (msg) => { pyodideStdout += `${msg}\n` } });
+  pyodide.std
 
   
   try {
