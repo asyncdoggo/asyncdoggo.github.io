@@ -16,9 +16,9 @@ export default function ChatBot() {
     let initialized = false;
 
     let prompt = "USER: ";
-    waitForElement('#terminal', () => {
+    waitForElement('#terminal_chatbot', () => {
         jQuery(function ($: any) {
-            $('#terminal').terminal(async function (command: string, term: any) {
+            $('#terminal_chatbot').terminal(async function (command: string, term: any) {
                 if(!initialized){
                     const index = parseInt(command);
                     const success = await init(index - 1);
@@ -125,7 +125,7 @@ export default function ChatBot() {
 
     return (
         <div className="w-full h-full" id="ChatBot_inner">
-            <div id="terminal"></div>
+            <div id="terminal_chatbot"></div>
         </div>
     )
 

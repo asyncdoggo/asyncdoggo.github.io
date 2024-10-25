@@ -3,9 +3,9 @@ import { waitForElement } from "../globals";
 import { asyncRun } from "../blogs/python/workerApi";
 
 export default function PythonREPL() {
-    waitForElement('#terminal', () => {
+    waitForElement('#terminal_python', () => {
         jQuery(function ($: any) {
-            $('#terminal').terminal(async function (command: string, term: any) {
+            $('#terminal_python').terminal(async function (command: string, term: any) {
                 term.pause();
                 try {
                     const { result, error } = await asyncRun(command, {}, true);
@@ -35,7 +35,7 @@ export default function PythonREPL() {
 
     return (
         <div className="w-full h-full">
-            <div id="terminal"></div>
+            <div id="terminal_python"></div>
         </div>
     )
 }
