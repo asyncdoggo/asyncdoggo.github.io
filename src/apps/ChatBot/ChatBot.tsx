@@ -1,5 +1,5 @@
 import * as React from "jsx-dom"
-import { progress, interruptEngine, streamingResponse, init, messages } from "./llmUtils"
+import { progress, interruptEngine, streamingResponse, init, messages, availableModels } from "./llmUtils"
 import { waitForElement } from "../../globals";
 
 export default function ChatBot() {
@@ -20,7 +20,13 @@ export default function ChatBot() {
         jQuery(function ($: any) {
             $('#terminal').terminal(async function (command: string, term: any) {
                 if(!initialized){
-                    init();
+                    const index = parseInt(command);
+                    const success = await init(index - 1);
+                    if (!success) {
+                        term.error("You did not enter a valid model number. I hope you know what a number is.");
+                        term.resume();
+                        return;
+                    }
                 }
 
                 if (progress.progress < 1) {
@@ -28,10 +34,22 @@ export default function ChatBot() {
                     initialized = true;
                     asyncCaller(() => {
                         term.update(term.last_index(), `Loading model: ${progress.text}`)
+                        if (progress.progress === 1) {
+                            term.clear();
+                            term.echo(`Model loaded successfully!\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
+                        }
                     });
                     
                 }
-                else {
+
+                else if (command === "clear") {
+                    term.clear();
+                    messages.length = 0;
+                    messages.push({ role: "system", content: "You are a helpful AI assistant." });
+                    term.echo("Chat cleared.");
+                    term.resume();
+                }
+                else if(progress.progress === 1){
                     try {
                         if (command.trim() === "") {
                             term.resume();
@@ -63,7 +81,17 @@ export default function ChatBot() {
                     }
                 }
             }, {
-                greetings: `Using model Llama-3.2-1B-Instruct-q4f16_1-MLC, if you are using this for the first time, it may take a while to load. \nTHIS MODEL WILL NOT LOAD IN INCOGNITO MODE.\nPress ENTER to load the model. Type 'q' to stop the model from generating.`,
+                greetings: `Welcome to the Chat BOT!
+Here are the list of available models to load:
+`
++
+availableModels.map((model, index) => {
+    return `${index + 1}. ${model.name} - ${model.notes}`
+}).join("\n")
++
+`
+Type the number of the model you want to load and press enter.
+`,
                 name: 'Chat BOT',
                 prompt: prompt,
                 height: 400,
@@ -77,7 +105,8 @@ export default function ChatBot() {
                         }
                         return false;
                     }
-                }
+                },
+                clear: false
             });
 
         })

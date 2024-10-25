@@ -7,6 +7,8 @@ import FileManager from './apps/FileManager';
 import games_icon from './assets/games.svg';
 import python from './assets/python.svg';
 import PythonREPL from "./apps/Python";
+import chatbot_icon from './assets/chatbot.svg';
+import ChatBot from "./apps/ChatBot/ChatBot";
 
 export default function Desktop() {
     return (
@@ -27,6 +29,13 @@ export default function Desktop() {
                     <img src={python} alt="Python" className="h-16 w-16" />
                     <p className="text-white">Python</p>
                 </button>
+
+                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('ChatBot', chatbot_icon, <ChatBot />, "700px", "450px")}>
+                    <img src={chatbot_icon} alt="ChatBot" className="h-16 w-16" />
+                    <p className="text-white">ChatBot</p>
+                </button>
+
+
 
             </div>
             <Taskbar />

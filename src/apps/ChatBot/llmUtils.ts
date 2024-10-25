@@ -11,16 +11,30 @@ const engine = new MLCEngine(
 { initProgressCallback: initProgressCallback }, // engineConfig
 );
  
+export const availableModels = [
+  {
+    name: "SmolLM-360M-Instruct-q0f16-MLC",
+    notes: "tiny, fast, and good for testing, incoherent responses. WILL NOT LOAD IN INCOGNITO MODE.",
+  },
+  {
+    name: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
+    notes: "large, slower, smart enough. WILL NOT LOAD IN INCOGNITO MODE.",
+  }
+]
 
-
-export async function init(){
-    // Callback function to update model loading progress
-    console.log("Creating engine");
-    
-    const selectedModel = "SmolLM-135M-Instruct-q4f32_1-MLC";
-    // const selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
-    engine.reload(selectedModel);   
-    console.log("Engine created", engine);
+export async function init(index: number) {    
+    try {
+      const selectedModel = availableModels[index];      
+      if (!selectedModel) {
+        return false;
+      }
+      engine.reload(selectedModel.name);
+      return true;   
+    }
+    catch (e) {
+      console.log(e);
+      return false;
+    }
 }
 
 export async function completion(message: any){
