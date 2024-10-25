@@ -1,5 +1,5 @@
 import * as React from "jsx-dom"
-import { progress, interruptEngine, streamingResponse, init, messages, availableModels } from "./llmUtils"
+import { progress, interruptEngine, streamingResponse, init, messages, availableModels, resetChat, unload } from "./llmUtils"
 import { waitForElement } from "../../globals";
 
 export default function ChatBot() {
@@ -42,11 +42,23 @@ export default function ChatBot() {
                     
                 }
 
+                if (command === "unload") {
+                    term.clear();
+                    progress.progress = 0;
+                    progress.text = "";
+                    progress.timeElapsed = 0;
+                    interruptEngine();
+                    await unload();
+                    resetChat();
+                    term.echo(`Welcome to the Chat BOT!\nHere are the list of available models to load:\n` + availableModels.map((model, index) => {return `${index + 1}. ${model.name} - ${model.notes}`}).join("\n") + `\nType the number of the model you want to load and press enter.`);
+                    term.resume();
+                    initialized = false
+                }
+
                 else if (command === "clear") {
                     term.clear();
-                    messages.length = 0;
-                    messages.push({ role: "system", content: "You are a helpful AI assistant." });
-                    term.echo("Chat cleared.");
+                    resetChat();
+                    term.echo(`Chat cleared.\nUse "unload" to load a new model.\n"q" to interrupt generation.\n"clear" to reset the chat.`);
                     term.resume();
                 }
                 else if(progress.progress === 1){
@@ -81,17 +93,7 @@ export default function ChatBot() {
                     }
                 }
             }, {
-                greetings: `Welcome to the Chat BOT!
-Here are the list of available models to load:
-`
-+
-availableModels.map((model, index) => {
-    return `${index + 1}. ${model.name} - ${model.notes}`
-}).join("\n")
-+
-`
-Type the number of the model you want to load and press enter.
-`,
+                greetings: `Welcome to the Chat BOT!\nHere are the list of available models to load:\n` + availableModels.map((model, index) => {return `${index + 1}. ${model.name} - ${model.notes}`}).join("\n") + `\nType the number of the model you want to load and press enter.`,
                 name: 'Chat BOT',
                 prompt: prompt,
                 height: 400,
@@ -112,9 +114,17 @@ Type the number of the model you want to load and press enter.
         })
     })
 
+    waitForElement('#ChatBot_inner', () => {
+        (document.getElementById('ChatBot_inner')! as any).onCleanUp = () => {
+            interruptEngine();
+            unload();
+            
+        }
+    })
+
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full" id="ChatBot_inner">
             <div id="terminal"></div>
         </div>
     )

@@ -28,7 +28,7 @@ export default function Window(
 
     const windowRef = useRef<HTMLDivElement>(null)
 
-    function closeWindow(appName: string) {
+    function closeWindow(appName: string) {        
         const desktop = document.querySelector('.desktop')
         if (desktop) {
             openApps.splice(openApps.findIndex(app => app.name === appName), 1)
@@ -38,6 +38,8 @@ export default function Window(
 
             if (inner && inner.onCleanUp) {
                 inner.onCleanUp()
+                console.log('cleanup');
+                
             }
 
             desktop.removeChild(windowRef.current!)

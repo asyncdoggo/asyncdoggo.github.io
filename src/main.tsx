@@ -63,3 +63,10 @@ window.addEventListener('load', () => {
     }
 
 })
+
+// import * as React from "jsx-dom"
+// import ChatBot from "./apps/ChatBot/ChatBot"
+
+// window.addEventListener('load', () => {
+//     document.body.appendChild(<ChatBot />)
+// })

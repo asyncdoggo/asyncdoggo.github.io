@@ -23,6 +23,10 @@ export const availableModels = [
 ]
 
 export async function init(index: number) {    
+    progress = {progress: 0, text: "", timeElapsed: 0}
+    engine.resetChat();
+    engine.unload();
+
     try {
       const selectedModel = availableModels[index];      
       if (!selectedModel) {
@@ -51,11 +55,15 @@ export const messages = [
         role: "system", 
         content: "You are a helpful AI assistant." 
     },
-  ]
-
+]
 
 export const interruptEngine = () => {engine.interruptGenerate()}
-
+export const resetChat = () => {
+    messages.length = 0;
+    messages.push({ role: "system", content: "You are a helpful AI assistant." });
+    engine.resetChat();
+}
+export const unload = async () => {await engine.unload()}
 
 export const streamingResponse = async function (messages: any) {
     const chunks = await engine.chat.completions.create({
@@ -66,3 +74,4 @@ export const streamingResponse = async function (messages: any) {
       });
       return chunks;
 }
+
