@@ -5,10 +5,7 @@ import { waitForElement } from "../../globals";
 export default function ChatBot() {
  
     const asyncCaller = async (callback: any) => {
-        while (progress.progress < 1) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            callback();
-        }
+        callback();
     }
 
 
@@ -31,16 +28,17 @@ export default function ChatBot() {
                     }
                 }
 
-                if (progress.progress < 1 || !progress.text.startsWith("Finish")) {
+                if (progress.progress < 1) {
                     initialized = true;
-                    asyncCaller(() => {
-                        term.pause()
-                        term.update(term.last_index(), `Loading model: ${progress.text}`)
-                        if (progress.progress === 1) {
-                            term.clear();
-                            term.echo(`Model loaded successfully!\nSelected Model: ${availableModels[selectedIndex - 1].name}\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
-                            term.resume()
+                    asyncCaller(async () => {
+                        while (progress.progress < 1 || !progress.text.startsWith("Finish")) {
+                            await new Promise((resolve) => setTimeout(resolve, 500));
+                            term.pause()
+                            term.update(term.last_index(), `Loading model: ${progress.text}`);
                         }
+                        term.clear();
+                        term.echo(`Model loaded successfully!\nSelected Model: ${availableModels[selectedIndex - 1].name}\nUse "q" to interrupt generation, and "clear" to reset the chat.`);
+                        term.resume()
                     });
                 }
 
