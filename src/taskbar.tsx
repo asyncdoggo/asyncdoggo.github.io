@@ -64,13 +64,18 @@ export default function Taskbar() {
             >
                 <img src={user_icon} alt="user" className="h-8 w-8 ml-2" />
             </div>
-            <StartMenu />
+                {
+                    (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? (
+                    <></>) : 
+                    <StartMenu />
+                }
+
 
             <div className="w-full h-full px-2 mr-4 open-apps flex gap-x-4 items-center" id="taskbar_apps">
             </div>
 
 
-            <div className="center w-32 flex items-center pr-1" ref={dateDivRef}>
+            <div className="center w-42 flex items-center pr-1" ref={dateDivRef}>
                 {/* Date and time */}
                 {new Date().toDateString()} {new Date().toLocaleTimeString()}
             </div>

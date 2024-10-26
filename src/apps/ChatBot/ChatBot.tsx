@@ -35,6 +35,12 @@ export default function ChatBot() {
                             await new Promise((resolve) => setTimeout(resolve, 500));
                             term.pause()
                             term.update(term.last_index(), `Loading model: ${progress.text}`);
+                            if (progress.progress === -1) {
+                                term.clear();
+                                term.error(progress.text);
+                                term.error("Model did not load because you might be in incognito mode. Or there isn't enough memory to load the model.");
+                                return;
+                            }
                         }
                         term.clear();
                         term.echo(`Model loaded successfully!\nSelected Model: ${availableModels[selectedIndex - 1].name}\nUse "q" to interrupt generation, and "clear" to reset the chat.`);

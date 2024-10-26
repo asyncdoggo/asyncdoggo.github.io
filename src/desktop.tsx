@@ -9,6 +9,7 @@ import python from './assets/python.svg';
 import PythonREPL from "./apps/Python";
 import chatbot_icon from './assets/chatbot.svg';
 import ChatBot from "./apps/ChatBot/ChatBot";
+import blogs_icon from "./assets/blogs.svg";
 
 export default function Desktop() {
     return (
@@ -38,6 +39,24 @@ export default function Desktop() {
 
 
             </div>
+            <Taskbar />
+        </div>
+    );
+}
+
+
+export function MobileDesktop() {
+    return (
+        <div className="mobile-desktop">
+            <div className="text-white p-2 whitespace-pre-wrap">
+                Limited functionality on mobile devices    
+                You can still view the blogs
+            </div>                
+            <button className="icon pt-2 invert w-24 h-16 flex flex-col justify-center items-center" onClick={() => {window.location.href="/blogs"}}>
+                <img src={blogs_icon} alt="Blogs" className="h-16 w-16" />
+                <p className="text-white invert">Blogs</p>
+            </button>
+
             <Taskbar />
         </div>
     );

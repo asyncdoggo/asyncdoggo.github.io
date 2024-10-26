@@ -1,11 +1,13 @@
 import { useText } from "jsx-dom"
 import * as React from "jsx-dom"
-import Desktop from "./desktop"
+import Desktop, { MobileDesktop } from "./desktop"
 import BlogRouter from "./blogs/BlogsRouter"
-import "./index.css"
 import BlogsHome from "./blogs/BlogsHome"
 import bg_image from "./assets/bg-image.jpg"
 import back_btn from './assets/back.svg';
+import "./index.css"
+import FileManager from "./apps/FileManager"
+import ChatBot from "./apps/ChatBot/ChatBot"
 
 
 const blogs = [
@@ -55,18 +57,20 @@ window.addEventListener('load', () => {
         
         
     } else {
+        // If user agent is mobile, redirect to mobile site
+        
         document.body.style.backgroundImage = `url(${bg_image})`
         document.body.style.backgroundSize = "cover"
         document.body.style.backgroundAttachment = "fixed"
         document.body.style.backgroundRepeat = "no-repeat"
-        document.body.appendChild(<Desktop />)
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            if(window.location.pathname === "/"){
+                document.body.appendChild(<MobileDesktop />)
+            }
+        }
+        else{
+            document.body.appendChild(<Desktop />)
+        }
     }
 
 })
-
-// import * as React from "jsx-dom"
-// import ChatBot from "./apps/ChatBot/ChatBot"
-
-// window.addEventListener('load', () => {
-//     document.body.appendChild(<ChatBot />)
-// })

@@ -48,7 +48,14 @@ export async function init(index: number) {
       if (!selectedModel) {
         return false;
       }
-      engine.reload(selectedModel.name);
+      engine.reload(selectedModel.name).then(() => {
+        console.log("Model loaded successfully!");
+      })
+      .catch((e) => {
+        console.log(e);
+        progress = {progress: -1, text: "Failed to load model", timeElapsed: 0}
+        engine.unload();
+      });
       return true;   
     }
     catch (e) {
