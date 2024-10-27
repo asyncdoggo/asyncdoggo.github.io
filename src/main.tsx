@@ -6,8 +6,6 @@ import BlogsHome from "./blogs/BlogsHome"
 import bg_image from "./assets/bg-image.jpg"
 import back_btn from './assets/back.svg';
 import "./index.css"
-import FileManager from "./apps/FileManager"
-import ChatBot from "./apps/ChatBot/ChatBot"
 
 
 const blogs = [

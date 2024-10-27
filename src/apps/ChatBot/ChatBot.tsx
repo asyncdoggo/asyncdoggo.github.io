@@ -8,15 +8,20 @@ export default function ChatBot() {
         callback();
     }
 
+    // cleanup if previous model was loaded
+    unload();
 
     let generating = false;
     let initialized = false;
     let selectedIndex = 0;
 
+    let resize_observer: ResizeObserver;
+
     let prompt = "USER: ";
+
     waitForElement('#terminal_chatbot', () => {
         jQuery(function ($: any) {
-            $('#terminal_chatbot').terminal(async function (command: string, term: any) {
+            const terminal = $('#terminal_chatbot').terminal(async function (command: string, term: any) {
                 if(!initialized){
                     const index = parseInt(command);
                     selectedIndex = index;
@@ -84,7 +89,7 @@ export default function ChatBot() {
                         for await (const chunk of chunks) {
                             reply += chunk.choices[0]?.delta.content || "";
                             if (chunk.usage) {
-                            // console.log(chunk.usage); // only last chunk has usage
+                            console.log(chunk.usage); // only last chunk has usage
                             }
                             term.update(term.last_index(), reply);
                         }
@@ -117,13 +122,25 @@ export default function ChatBot() {
                 clear: false
             });
 
+            console.log(terminal);
+            
+
+            resize_observer = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    terminal.resize(entry.contentRect.width, entry.contentRect.height-50);
+                }
+            });
+
+            resize_observer.observe(document.getElementById('ChatBot')!);
+            document.getElementById('ChatBot')!.style.overflow = "hidden";            
         })
     })
 
     waitForElement('#ChatBot_inner', () => {
-        (document.getElementById('ChatBot_inner')! as any).onCleanUp = () => {
-            interruptEngine();
-            unload();
+        (document.getElementById('ChatBot_inner')! as any).onCleanUp = async () => {
+            await interruptEngine();
+            await unload();
+            resize_observer.disconnect();
             
         }
     })

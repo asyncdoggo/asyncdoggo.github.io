@@ -38,8 +38,6 @@ export default function Window(
 
             if (inner && inner.onCleanUp) {
                 inner.onCleanUp()
-                console.log('cleanup');
-                
             }
 
             desktop.removeChild(windowRef.current!)

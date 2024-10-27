@@ -9,11 +9,6 @@ export class TicTacToeClass extends React.Component {
         super(props)
     }
 
-    componentDidMount() {
-        console.log('componentDidMount');
-
-    }
-
     render(): React.ReactElement | null {
         return (
             <div

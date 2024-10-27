@@ -4,9 +4,7 @@ import { MLCEngine } from "@mlc-ai/web-llm";
 export let progress = {progress: 0, text: "", timeElapsed: 0}
 
 const initProgressCallback = (initProgress: any) => {
-    progress = initProgress;
-    console.log(progress);
-    
+    progress = initProgress;    
   }
 
 const engine = new MLCEngine(
@@ -35,6 +33,10 @@ export const availableModels = [
   {
     name: "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC",
     notes: "larger, slower, smart enough.",
+  },
+  {
+    name: "stablelm-2-zephyr-1_6b-q4f32_1-MLC-1k",
+    notes: "This guy is smart, kinda large and uncensored, be careful.",
   }
 ]
 
@@ -78,7 +80,7 @@ export const messages = [
     },
 ]
 
-export const interruptEngine = () => {engine.interruptGenerate()}
+export const interruptEngine = async () => {await engine.interruptGenerate()}
 export const resetChat = () => {
     messages.length = 0;
     messages.push({ role: "system", content: "You are a helpful AI assistant." });

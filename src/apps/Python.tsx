@@ -3,9 +3,12 @@ import { waitForElement } from "../globals";
 import { asyncRun } from "../blogs/python/workerApi";
 
 export default function PythonREPL() {
+
+    let resize_observer: ResizeObserver;
+
     waitForElement('#terminal_python', () => {
         jQuery(function ($: any) {
-            $('#terminal_python').terminal(async function (command: string, term: any) {
+            const terminal = $('#terminal_python').terminal(async function (command: string, term: any) {
                 term.pause();
                 try {
                     const { result, error } = await asyncRun(command, {}, true);
@@ -29,12 +32,22 @@ export default function PythonREPL() {
                 enabled: false,
             });
 
+
+            resize_observer = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    terminal.resize(entry.contentRect.width, entry.contentRect.height-50);
+                }
+            });
+
+            resize_observer.observe(document.getElementById('Python')!);
+            document.getElementById('Python')!.style.overflow = "hidden";
+
         })
     })
 
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full" id="Python_inner">
             <div id="terminal_python"></div>
         </div>
     )

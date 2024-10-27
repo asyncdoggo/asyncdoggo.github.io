@@ -49,13 +49,18 @@ export function MobileDesktop() {
     return (
         <div className="mobile-desktop">
             <div className="text-white p-2 whitespace-pre-wrap">
-                Limited functionality on mobile devices    
+                Limited functionality on mobile devices
                 You can still view the blogs
             </div>                
-            <button className="icon pt-2 invert w-24 h-16 flex flex-col justify-center items-center" onClick={() => {window.location.href="/blogs"}}>
-                <img src={blogs_icon} alt="Blogs" className="h-16 w-16" />
-                <p className="text-white invert">Blogs</p>
-            </button>
+
+            <div className="Desktop-icons-grid flex flex-row gap-x-4 p-4">
+
+                <button className="icon pt-2
+             invert w-24 h-16 flex flex-col justify-center items-center" onClick={() => { window.location.href = "/blogs" }}>
+                    <img src={blogs_icon} alt="Blogs" className="h-16 w-16" />
+                    <p className="text-white invert">Blogs</p>
+                </button>
+            </div>
 
             <Taskbar />
         </div>
