@@ -10,6 +10,8 @@ import PythonREPL from "./apps/Python";
 import chatbot_icon from './assets/chatbot.svg';
 import ChatBot from "./apps/ChatBot/ChatBot";
 import blogs_icon from "./assets/blogs.svg";
+import Editor from "./apps/Editor/Editor";
+import editor_svg from "./assets/editor.svg";
 
 export default function Desktop() {
     return (
@@ -36,7 +38,15 @@ export default function Desktop() {
                     <p className="text-white">ChatBot</p>
                 </button>
 
+                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Editor', editor_svg, <Editor />, "700px", "450px")}>
+                    <img src={editor_svg} alt="Editor" className="h-16 w-16" />
+                    <p className="text-white">Editor</p>
+                </button>
 
+                {/* <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => { window.location.href = "/editor" }}>
+                    <img src={python} alt="Editor" className="h-16 w-16" />
+                    <p className="text-white">Editor</p>
+                </button> */}
 
             </div>
             <Taskbar />
@@ -51,7 +61,7 @@ export function MobileDesktop() {
             <div className="text-white p-2 whitespace-pre-wrap">
                 Limited functionality on mobile devices
                 You can still view the blogs
-            </div>                
+            </div>
 
             <div className="Desktop-icons-grid flex flex-row gap-x-4 p-4">
 

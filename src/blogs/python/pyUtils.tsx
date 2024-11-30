@@ -7,7 +7,7 @@ import { indentOnInput, indentUnit } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { python } from "@codemirror/lang-python";
 import { waitForElementFromRef } from "../../globals";
-import {asyncRun} from "./workerApi";
+import {asyncRun} from "../../utils/workerApi";
 
 
 export function InlineCode({code}:any) {

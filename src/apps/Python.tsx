@@ -1,6 +1,6 @@
 import * as React from "jsx-dom";
 import { waitForElement } from "../globals";
-import { asyncRun } from "../blogs/python/workerApi";
+import { asyncRun } from "../utils/workerApi";
 
 export default function PythonREPL() {
 
