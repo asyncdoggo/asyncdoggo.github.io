@@ -4,6 +4,7 @@ import { currentFocusedApp, openApps, removeCurrentFocusedApp, setCurrentFocused
 import { updateTaskBar } from "./taskbar"
 import maximize from "./assets/maximize.svg"
 import minimize from "./assets/minimize.svg"
+import closebtn from "./assets/close.png"
 
 
 
@@ -119,7 +120,7 @@ export default function Window(
                     <button className="close-button w-8 h-8 flex justify-center items-center"
                         onClick={() => closeWindow(appName)}
                     >
-                        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" alt="minimize" className="w-4" />
+                        <img src={closebtn} alt="minimize" className="w-4" />
                     </button>
 
                 </div>

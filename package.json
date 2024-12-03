@@ -27,9 +27,14 @@
     "@codemirror/view": "^6.33.0",
     "@fontsource/gloria-hallelujah": "^5.0.20",
     "@mlc-ai/web-llm": "^0.2.73",
+    "comlink": "^4.4.2",
+    "comsync": "^0.0.9",
     "jquery.terminal": "^2.44.1",
     "jsx-dom": "^8.1.4",
     "mathjs": "^13.1.1",
-    "monaco-editor": "^0.52.0"
+    "monaco-editor": "^0.52.0",
+    "pyodide": "^0.26.4",
+    "pyodide-worker-runner": "^1.4.0",
+    "sync-message": "^0.0.12"
   }
 }

@@ -121,10 +121,7 @@ export default function ChatBot() {
                 },
                 clear: false
             });
-
-            console.log(terminal);
             
-
             resize_observer = new ResizeObserver((entries) => {
                 for (let entry of entries) {
                     terminal.resize(entry.contentRect.width, entry.contentRect.height-50);

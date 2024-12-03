@@ -1,6 +1,6 @@
 import * as React from "jsx-dom";
 import { waitForElement } from "../globals";
-import { asyncRun } from "../utils/workerApi";
+import { asyncRun } from "../utils/pyodide_helper";
 
 export default function PythonREPL() {
 
@@ -11,12 +11,9 @@ export default function PythonREPL() {
             const terminal = $('#terminal_python').terminal(async function (command: string, term: any) {
                 term.pause();
                 try {
-                    const { result, error } = await asyncRun(command, {}, true);
+                    const {result} = await asyncRun(command, true);
                     if (result) {
                         term.echo(result);
-                    }
-                    if (error) {
-                        term.error(error);
                     }
                 } catch (e) {
                     term.error(e);

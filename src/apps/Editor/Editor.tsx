@@ -1,7 +1,7 @@
 import * as React from 'jsx-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { waitForElementFromRef } from '../../globals';
-import { asyncRun } from '../../utils/workerApi';
+import { asyncRun } from '../../utils/pyodide_helper';
 import run_btn from '../../assets/runbtn.svg';
 
 
@@ -107,8 +107,8 @@ export default function Editor() {
         const value = editor?.getValue();
         const outputBlock = outputRef.current!;
         outputBlock.innerHTML = "";
-        const { result, error } = await asyncRun(value, {}, false);
-        outputBlock.innerText = result || error;
+        const { result } = await asyncRun(value, false);
+        outputBlock.innerText = result;
         loading = false;
         runButton.classList.add('hidden');
     }

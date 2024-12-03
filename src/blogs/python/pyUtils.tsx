@@ -7,7 +7,7 @@ import { indentOnInput, indentUnit } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { python } from "@codemirror/lang-python";
 import { waitForElementFromRef } from "../../globals";
-import {asyncRun} from "../../utils/workerApi";
+import {asyncRun} from "../../utils/pyodide_helper";
 
 
 export function InlineCode({code}:any) {
@@ -79,9 +79,9 @@ export function CodeExecutionBlock({ expectedOutput }: { expectedOutput: any }) 
     const runCode = async () => {
         try {
             const codeToRun = view.state.doc.toString();
-            const { result, error, pyVariables: pyvars } = await asyncRun(codeToRun, {}, false);
-            outputBlock.current!.innerHTML = result || error;            
-            pyodideStdout = result || error;
+            const { result, variables: pyvars } = await asyncRun(codeToRun, false);
+            outputBlock.current!.innerHTML = result       
+            pyodideStdout = result
             pyVariables = pyvars;
         }
         catch (e:any) {

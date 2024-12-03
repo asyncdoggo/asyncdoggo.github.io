@@ -9,7 +9,7 @@ export default defineConfig({
             input: {
                 main: resolve(__dirname, 'index.html'),
             }
-        }
+        },
     },
     plugins: [
         {
@@ -23,4 +23,10 @@ export default defineConfig({
             }
         }
     ],
+    optimizeDeps: {
+        exclude: ['pyodide']    
+    },
+    worker: {
+        format: 'es',
+    }
 })
