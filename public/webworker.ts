@@ -34,6 +34,7 @@ const execute = async (extras: PyodideExtras, code: any) => {
        const read = extras.readMessage();
         return read;
       },
+      isatty: true
     })
 
 
@@ -55,14 +56,10 @@ const execute = async (extras: PyodideExtras, code: any) => {
           }        
         }
       }
-  
-  
       return {result, variables: x}; 
     }
     catch(e){
       result += e.toString();
       return {result, variables: {}};
     }
-        
-    
   }
