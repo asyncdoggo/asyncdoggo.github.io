@@ -1,1 +1,3 @@
+/blogs/python/assets/* /assets/:splat 301
+/blogs/assets/* /assets/:splat 301
 /* /index.html 200
