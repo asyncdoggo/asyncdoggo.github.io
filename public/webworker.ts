@@ -1,6 +1,7 @@
-import {pyodideExpose} from "pyodide-worker-runner";
+import {pyodideExpose, PyodideExtras} from "pyodide-worker-runner";
 import * as Comlink from "comlink";
-import { loadPyodide } from "pyodide";
+import {loadPyodide} from "pyodide";
+
 let pyodideReadyPromise = loadPyodide();
 
 
@@ -9,13 +10,13 @@ Comlink.expose({
     return execute(extras, code);
   }),
   runInlinePython: pyodideExpose((extras, code) => {
-    extras.inline = true;
+    (extras as any).inline = true;
     return execute(extras, code);
   })
 });
 
 
-const execute = async (extras, code) => {
+const execute = async (extras: PyodideExtras, code: any) => {
   let result = ''
 
   const pyodide = await pyodideReadyPromise;
@@ -23,7 +24,7 @@ const execute = async (extras, code) => {
       pyodide.setInterruptBuffer(extras.interruptBuffer);
     }
 
-    pyodide.setStdout({ batched: (msg) => { result += `${msg}\n` } });
+    pyodide.setStdout({ batched: (msg: any) => { result += `${msg}\n` } });
     pyodide.setStdin({
       stdin: () => {
        const read = extras.readMessage();
@@ -31,11 +32,11 @@ const execute = async (extras, code) => {
       },
     })
     const output = pyodide.runPython(code);    
-    if (extras.inline && output){
+    if ((extras as any).inline && output){
       result += output.toString();
     }
 
-    let x = {};
+    let x: any = {};
     const pyVariables = pyodide.globals.toJs();
     for (let key in pyVariables) {
       if(pyVariables[key] !== undefined) {

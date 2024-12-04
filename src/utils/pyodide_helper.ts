@@ -1,9 +1,9 @@
 
 import {PyodideClient} from "pyodide-worker-runner";
-import MyWorker from "./webworker?worker";
 import { makeChannel } from "sync-message";
 
-const myWorker = new MyWorker();
+// const myWorker = new MyWorker({name: "python_worker"});
+const myWorker = new Worker(new URL("/webworker.ts?worker_file&type=module", import.meta.url), {type: "module"});
 const py = new PyodideClient(
     () => myWorker,
     makeChannel(
