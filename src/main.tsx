@@ -78,7 +78,3 @@ window.addEventListener('load', () => {
     }
 
 })
-
-// document.body.appendChild(<Desktop />)
-
-// document.body.appendChild(<>Hello</>)

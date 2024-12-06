@@ -14,64 +14,72 @@ const initialize = async (pyodide: any) => {
     FS.mkdir("/code");
     FS.mount(FS.filesystems.IDBFS, {
       root: ".",
-      autoPersist: true,
     }, "/code");
+    await FS.syncfs(true, (err: any) => {});
   }
+  return pyodide;
 }
 
-
-initialize(await pyodideReadyPromise).then(() => {
-  Comlink.expose({
-    runPython: pyodideExpose((extras, code, inline) => {
-      return execute(extras, code, inline);
-    }),
-    FS: pyodideExpose(
-      async (
-        extras,
-        option: {
-                action: string,
-                args: any
-                }
-      ) => {
-        const pyodide = await pyodideReadyPromise;
-        const FS = pyodide.FS;
-
-        switch (option.action) {
-          case "write":
-            FS.writeFile(option.args.path, option.args.data);
-            break;
-          case "read":
-            return FS.readFile(option.args.path, { encoding: "utf8" });
-          case "list":
-            return FS.readdir(option.args.path);
-          case "remove":
-            FS.unlink(option.args.path);
-            break;
-          case "mkdir":
-            FS.mkdir(option.args.path);
-            break;
-          case "rmdir":
-            FS.rmdir(option.args.path);
-            break;
-          case "exists":
-            return FS.analyzePath(option.args.path).exists;
-          case "stat":
-            return FS.stat(option.args.path);
-          case 'sync':
-            await FS.syncfs(false, (err: any) => {
-              if (err) {
-                console.error(err);
+Comlink.expose({
+  runPython: pyodideExpose(async (extras, code, inline) => {
+    const pyodide = await pyodideReadyPromise;
+      if (!initialized) {
+        await initialize(pyodide);
+      }
+    return execute(extras, code, inline);
+  }),
+  FS: pyodideExpose(
+   async (
+      extras,
+      option: {
+              action: string,
+              args: any
               }
-            });
-            return "synced";
-          default:
-            break;
-        }
-      } 
-    ),
-  });  
-});
+    ) => {
+      const pyodide = await pyodideReadyPromise;
+      if (!initialized) {
+        await initialize(pyodide);
+      }
+      const FS = pyodide.FS;
 
+      switch (option.action) {
+        case "write":
+          FS.writeFile(option.args.path, option.args.data);
+          break;
+        case "read":
+          return FS.readFile(option.args.path, { encoding: "utf8" });
+        case "list":
+          return FS.readdir(option.args.path);
+        case "remove":
+          FS.unlink(option.args.path);
+          break;
+        case "mkdir":
+          FS.mkdir(option.args.path);
+          break;
+        case "rmdir":
+          FS.rmdir(option.args.path);
+          break;
+        case "exists":
+          return FS.analyzePath(option.args.path).exists;
+        case "stat":
+          return FS.stat(option.args.path);
+        case 'sync':
+          FS.syncfs(false, (err: any) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+          return "syncing";
+        default:
+          break;
+      }
+    } 
+  ),
+  waitUntilReady: async () => {
+    await pyodideReadyPromise;
+    return "ready";
+  },
+});
 
 
 const execute = async (extras: PyodideExtras, code: string, inline: boolean) => {

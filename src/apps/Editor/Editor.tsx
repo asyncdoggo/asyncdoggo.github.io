@@ -1,9 +1,10 @@
 import * as React from 'jsx-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { waitForElementFromRef } from '../../globals';
-import { asyncRun } from '../../utils/pyodide_helper';
+import { asyncRun, FS } from '../../utils/pyodide_helper';
 import run_btn from '../../assets/runbtn.svg';
-
+import new_file_icon from '../../assets/new-file.svg';
+import new_folder_icon from '../../assets/folder-new.svg';
 
 export default function Editor() {
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -21,11 +22,23 @@ export default function Editor() {
 
     let loading = false;
 
+    let currentFile = 'main.py';
+    let currentFileData = '';
+
+    const setCurrentFile = (file: string) => {
+        currentFile = file;
+    }
+
+    const setCurrentFileData = (data: string) => {
+        currentFileData = data;
+        editor?.setValue(data);
+    }
+
 
     waitForElementFromRef(monacoEl, () => {
         if (monacoEl && !editor) {
             setEditor(monaco.editor.create(monacoEl.current!, {
-                value: localStorage.getItem('code') || `print('Hello World')`,
+                value: currentFileData,
                 language: 'python',
                 theme: 'vs-dark',
                 automaticLayout: false,
@@ -56,7 +69,7 @@ export default function Editor() {
     })
 
 
-    const onMouseDown = (e: MouseEvent) => {
+    const onMouseDownEditor = (e: MouseEvent) => {
         e.preventDefault();
         const startY = e.clientY;
         const startHeight = height;
@@ -76,13 +89,43 @@ export default function Editor() {
         window.addEventListener('mouseup', onMouseUp);
     }
 
+    const onMouseDownFileTree = (e: MouseEvent) => {
+        e.preventDefault();
+        const fileTree = document.getElementById('file-tree')!;
+        const startX = e.clientX;
+        const startWidth = fileTree.clientWidth;
+        const onMouseMove = (e: MouseEvent) => {
+            const w = startWidth + e.clientX - startX
+            if (w < 100) {
+                return;
+            }
+            fileTree.style.width = `${w}px`;
+            monacoEl.current!.style.width = `calc(100% - ${w}px)`;
+            editor?.layout({
+                width: window.innerWidth - w,
+                height: height
+            });
+        }
+        const onMouseUp = () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+        }
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    }
+
+    const saveFile = () => {
+        const value = editor?.getValue();
+        currentFileData = value!;
+        showSavedPopup();
+        FS('write', { path: `/home/pyodide/${currentFile}`, data: value });
+        FS('sync', {});
+    }
 
     window.addEventListener('keydown', (e) => {
         if (e.key === 's' && e.ctrlKey) {
             e.preventDefault();
-            const value = editor?.getValue();
-            localStorage.setItem('code', value!);
-            showSavedPopup();
+            saveFile();
         }
     })
 
@@ -113,15 +156,24 @@ export default function Editor() {
         runButton.classList.add('hidden');
     }
 
-
     return (
         <>
             <div className="flex flex-col h-full" ref={mainContainer}>
-                <div ref={monacoEl} className="flex-grow">
+                <div className="flex flex-row px-2 bg-gray-800">
+                    <FileTree 
+                    setCurrentFile={setCurrentFile}
+                    setCurrentFileData={setCurrentFileData} 
+
+                    />
+                    <div className="divider bg-red-900 px-2 h-auto cursor-ew-resize"
+                        onMouseDown={onMouseDownFileTree}
+                    ></div>
+                    <div ref={monacoEl} className="flex-grow">
+                    </div>
 
                 </div>
                 <div className="splitter border hover:cursor-ns-resize min-h-2 bg-blue-900"
-                    onMouseDown={onMouseDown}
+                    onMouseDown={onMouseDownEditor}
                 ></div>
                 <div className="run-button flex flex-row gap-x-4 select-none w-12 m-2 cursor-pointer bg-green-500 text-white text-center p-2"
                     onClick={runScript}
@@ -145,3 +197,107 @@ export default function Editor() {
         </>
     )
 };
+
+
+
+function FileTree(
+    {
+        setCurrentFile,
+        setCurrentFileData
+    }: {
+        setCurrentFile: (file: string) => void,
+        setCurrentFileData: (data: string) => void,
+    }
+) {
+    const fileTreeContentRef = React.useRef<HTMLDivElement>(null);
+
+
+    const deleteFile = (filename: string) => {
+        if (filename === 'main.py') {
+            alert('Cannot delete main.py');
+            return;
+        }
+        FS('remove', { path: `/home/pyodide/${filename}` });
+        updateFileTree();
+    }
+
+    const updateFileTree = async () => {
+        const res = await FS('list', { path: '/home/pyodide' });
+        const fileTreeContent = fileTreeContentRef.current!;
+        fileTreeContent.innerHTML = "";
+        console.log(res);
+        
+        const ul = <ul></ul>;
+        fileTreeContent.appendChild(ul);
+        for (const file of res) {
+            if (file !== '..' && file !== '.') {
+                const li = 
+                <li
+                    className="cursor-pointer w-full flex flex-row justify-between"
+                    onClick={() => {
+                        FS('read', { path: `/home/pyodide/${file}` }).then((res) => {
+                            setCurrentFile(file);
+                            setCurrentFileData(res);                            
+                        });
+                    }}
+                >
+                    {file}
+                    <span className="text-red-600"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            deleteFile(file);
+                        }
+                    }
+                    >
+                        X
+                    </span>
+                    </li>;
+                ul.appendChild(li);
+            }
+        }
+
+        // set current file to main.py if nothing exists
+        if (res.length === 2) {
+            setCurrentFile('main.py');
+            setCurrentFileData('');
+            new_file('main.py');
+        }
+    }
+
+    waitForElementFromRef(fileTreeContentRef, updateFileTree);
+
+    const new_file = (filename: string | null) => {
+        if (filename === null) {
+            filename = prompt('Enter filename: ') || 'main.py';
+        }
+        FS('write', { path: `/home/pyodide/${filename}`, data: '' });
+        updateFileTree();
+    }
+    return (
+        <div
+            className="file-tree flex flex-col bg-gray-900 px-4 text-white"
+            id="file-tree"
+        >
+            <div className="file-tree-header">Files</div>
+            <div className="file-tree-actions flex flex-row gap-x-2">
+                <button className=""
+                    onClick={() => new_file(null)}
+                >
+                    <img src={new_file_icon} alt="New File" className="w-6 h-6 invert" />
+                </button>
+                <button className="">
+                    <img src={new_folder_icon} alt="New Folder" className="w-6 h-6 invert" />
+                </button>
+            </div>
+
+
+            <div className="file-tree-content"
+                id="file-tree-content"
+                ref={fileTreeContentRef}
+            >
+                loading...
+            </div>
+
+        </div>
+    )
+}

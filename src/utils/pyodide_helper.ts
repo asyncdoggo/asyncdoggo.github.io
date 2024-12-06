@@ -1,28 +1,16 @@
 
-import {PyodideClient} from "pyodide-worker-runner";
+import { PyodideClient } from "pyodide-worker-runner";
 import { makeChannel } from "sync-message";
 
 // const myWorker = new MyWorker({name: "python_worker"});
-const myWorker = new Worker(new URL("/webworker.ts?worker_file&type=module", import.meta.url), {type: "module"});
+const myWorker = new Worker(new URL("/webworker.ts?worker_file&type=module", import.meta.url), { type: "module" });
 const py = new PyodideClient(
     () => myWorker,
     makeChannel(
-        {atomics: {bufferSize: 1024}},
+        { atomics: { bufferSize: 1024 } },
     ),
-    
+
 );
-// const int = setInterval(() => {
-//     if (py.state === "awaitingMessage") {
-//         py.writeMessage("hello\n");
-//         clearInterval(int);
-//     }
-// }, 1000);
-
-// const x = await py.call(py.workerProxy.runPython, "1+1")
-// console.log(x);
-
-// const y = await py.call(py.workerProxy.runInlinePython, "1+1")
-// console.log(y);
 
 
 setInterval(() => {
@@ -33,6 +21,17 @@ setInterval(() => {
 
 
 export async function asyncRun(script: any, inline: boolean) {
+    while (py.state !== "idle") {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
     const res: {result: string, variables: {}} = await py.call(py.workerProxy.runPython, script, inline);
     return res;
+}
+
+export async function FS(action: string, args: any) {
+    while (py.state !== "idle") {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    return await py.call(py.workerProxy.FS, { action, args });
 }
