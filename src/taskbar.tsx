@@ -1,7 +1,7 @@
 import { useRef } from 'jsx-dom';
 import * as React from 'jsx-dom';
 import { startApplication } from './desktop';
-import { openApps, toggleMinimizeWindow } from './globals';
+import { openApps, toggleMinimizeWindow, currentFocusedApp, removeCurrentFocusedApp } from './globals';
 import settings from "./assets/settings.svg"
 import file_manager from "./assets/file_manager.svg"
 import FileManager from './apps/FileManager';
@@ -13,6 +13,23 @@ import user_white from "./assets/user_white.svg"
 import calculator_icon from "./assets/calculator.svg"
 import Calculator from './apps/calculator';
 
+function closeWindow(appName: string) {        
+    const desktop = document.querySelector('.desktop')
+    if (desktop) {
+        openApps.splice(openApps.findIndex(app => app.name === appName), 1)
+        currentFocusedApp === appName && removeCurrentFocusedApp()
+        updateTaskBar();
+        const inner = document.getElementById(`${appName}_inner`) as any
+
+        if (inner && inner.onCleanUp) {
+            inner.onCleanUp()
+        }
+
+        desktop.removeChild(document.getElementById(appName)!)
+    }
+}
+
+
 export function updateTaskBar() {
     const taskbarApps = document.getElementById('taskbar_apps')
     if (taskbarApps) {
@@ -21,8 +38,24 @@ export function updateTaskBar() {
             const appIcon = <div
                 title={app.name}
                 className="taskbar-app-item px-2 py-2 hover:bg-gray-200"
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     toggleMinimizeWindow(app.name)
+                }}
+                onContextMenu={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('right click');
+
+                    // find mouse position and open context menu
+                    const contextMenu = document.getElementById('context-menu')
+                    if (contextMenu) {
+                        contextMenu.style.display = 'block'
+                        contextMenu.style.left = `${e.clientX}px`
+                        contextMenu.style.top = `${e.clientY - contextMenu.clientHeight}px`
+                        contextMenu.setAttribute('data-app', app.name)
+                    }
                 }}
             >
                 <img src={app.icon} alt={app.name} className="h-8 w-8" />
@@ -64,14 +97,15 @@ export default function Taskbar() {
             >
                 <img src={user_icon} alt="user" className="h-8 w-8 ml-2" />
             </div>
-                {
-                    (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? (
-                    <></>) : 
+            {
+                (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? (
+                    <></>) :
                     <StartMenu />
-                }
+            }
 
 
-            <div className="w-full h-full px-2 mr-4 open-apps flex gap-x-4 items-center" id="taskbar_apps">
+            <div className="w-full h-full px-2 mr-4 open-apps flex gap-x-4 items-center"
+                id="taskbar_apps">
             </div>
 
 
@@ -80,10 +114,68 @@ export default function Taskbar() {
                 {new Date().toDateString()} {new Date().toLocaleTimeString()}
             </div>
 
+
+            <div id="context-menu" className="bg-gray-900 fixed border border-gray-300 rounded-lg shadow-lg hidden">
+                
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                    onClick={() => {
+                        const contextMenu = document.getElementById('context-menu')
+                        if (contextMenu) {
+                            contextMenu.style.display = 'none'
+                        }
+                        const appName = contextMenu?.getAttribute('data-app')
+                        if (appName) {
+                            document.getElementById(appName)!.style.width = '100px'
+                            document.getElementById(appName)!.style.height = '100px'
+                            document.getElementById(appName)!.style.top = '50%'
+                            document.getElementById(appName)!.style.left = '50%'
+                        }
+                    }}
+                >
+                    Resize
+
+                </div>
+
+
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                    onClick={() => {
+                        const contextMenu = document.getElementById('context-menu')
+                        if (contextMenu) {
+                            contextMenu.style.display = 'none'
+                        }
+                        const appName = contextMenu?.getAttribute('data-app')
+                        if (appName) {
+                            toggleMinimizeWindow(appName)
+                        }
+                    }}
+                >
+                    Maximize/Minimize
+                </div>
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                    onClick={() => {
+                        const contextMenu = document.getElementById('context-menu')
+                        if (contextMenu) {
+                            contextMenu.style.display = 'none'
+                        }
+                        const appName = contextMenu?.getAttribute('data-app')
+                        if (appName) {
+                            closeWindow(appName)
+                        }
+                    }}
+                >
+                    Close
+                    </div>
+            </div>
         </div>
     )
 }
-
+// To dismiss the context menu on click outside
+document.addEventListener('click', () => {
+    const contextMenu = document.getElementById('context-menu')
+    if (contextMenu) {
+        contextMenu.style.display = 'none'
+    }
+})
 
 let showStartMenu = false
 

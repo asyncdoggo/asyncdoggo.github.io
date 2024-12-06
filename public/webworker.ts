@@ -11,10 +11,9 @@ const initialize = async (pyodide: any) => {
     initialized = true;
 
     const FS = pyodide.FS;
-    FS.mkdir("/code");
     FS.mount(FS.filesystems.IDBFS, {
       root: ".",
-    }, "/code");
+    }, "/home/pyodide");
     await FS.syncfs(true, (err: any) => {});
   }
   return pyodide;
