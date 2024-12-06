@@ -27,6 +27,7 @@ export default function Editor() {
 
     const setCurrentFile = (file: string) => {
         currentFile = file;
+        document.querySelector('#file-name')!.textContent = file;
     }
 
     const setCurrentFileData = (data: string) => {
@@ -60,7 +61,7 @@ export default function Editor() {
 
                 monacoEl.current!.style.height = `${height}px`;
                 editor?.layout({
-                    width: window.innerWidth,
+                    width: document.getElementById('Editor')!.clientWidth - document.getElementById('file-tree')!.clientWidth,
                     height: height
                 });
             });
@@ -76,7 +77,7 @@ export default function Editor() {
         const onMouseMove = (e: MouseEvent) => {
             monacoEl.current!.style.height = `${startHeight + e.clientY - startY}px`;
             editor?.layout({
-                width: window.innerWidth,
+                width: editor!.getLayoutInfo().width,
                 height: startHeight + e.clientY - startY
             });
             setHeight(startHeight + e.clientY - startY);
@@ -99,10 +100,17 @@ export default function Editor() {
             if (w < 100) {
                 return;
             }
+            console.log(w);
+            
+            if (w > document.getElementById('Editor')!.clientWidth - 100) {
+                return;
+            }
+
             fileTree.style.width = `${w}px`;
             monacoEl.current!.style.width = `calc(100% - ${w}px)`;
+            document.getElementById('editor-main')!.style.width = `calc(100% - ${w}px)`;
             editor?.layout({
-                width: window.innerWidth - w,
+                width: document.getElementById('editor-main')!.clientWidth,
                 height: height
             });
         }
@@ -160,15 +168,20 @@ export default function Editor() {
         <>
             <div className="flex flex-col h-full" ref={mainContainer}>
                 <div className="flex flex-row px-2 bg-gray-800">
-                    <FileTree 
-                    setCurrentFile={setCurrentFile}
-                    setCurrentFileData={setCurrentFileData} 
+                    <FileTree
+                        setCurrentFile={setCurrentFile}
+                        setCurrentFileData={setCurrentFileData}
 
                     />
                     <div className="divider bg-red-900 px-2 h-auto cursor-ew-resize"
                         onMouseDown={onMouseDownFileTree}
                     ></div>
-                    <div ref={monacoEl} className="flex-grow">
+                    <div id='editor-main'>
+                        <div className="editor-header bg-gray-900 text-white p-2">
+                            <div id="file-name">{currentFile}</div>
+                        </div>
+                        <div ref={monacoEl} className="flex-grow">
+                        </div>
                     </div>
 
                 </div>
@@ -225,32 +238,31 @@ function FileTree(
         const res = await FS('list', { path: '/home/pyodide' });
         const fileTreeContent = fileTreeContentRef.current!;
         fileTreeContent.innerHTML = "";
-        console.log(res);
-        
+
         const ul = <ul></ul>;
         fileTreeContent.appendChild(ul);
         for (const file of res) {
             if (file !== '..' && file !== '.') {
-                const li = 
-                <li
-                    className="cursor-pointer w-full flex flex-row justify-between"
-                    onClick={() => {
-                        FS('read', { path: `/home/pyodide/${file}` }).then((res) => {
-                            setCurrentFile(file);
-                            setCurrentFileData(res);                            
-                        });
-                    }}
-                >
-                    {file}
-                    <span className="text-red-600"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            deleteFile(file);
-                        }
-                    }
+                const li =
+                    <li
+                        className="cursor-pointer w-full flex flex-row justify-between"
+                        onClick={() => {
+                            FS('read', { path: `/home/pyodide/${file}` }).then((res) => {
+                                setCurrentFile(file);
+                                setCurrentFileData(res);
+                            });
+                        }}
                     >
-                        X
-                    </span>
+                        {file}
+                        <span className="text-red-600"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                deleteFile(file);
+                            }
+                            }
+                        >
+                            X
+                        </span>
                     </li>;
                 ul.appendChild(li);
             }
