@@ -33,6 +33,6 @@ setInterval(() => {
 
 
 export async function asyncRun(script: any, inline: boolean) {
-    const res: {result: string, variables: {}} = await py.call(inline ? py.workerProxy.runInlinePython : py.workerProxy.runPython, script);
+    const res: {result: string, variables: {}} = await py.call(py.workerProxy.runPython, script, inline);
     return res;
 }
