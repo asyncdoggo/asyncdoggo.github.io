@@ -78,3 +78,7 @@ window.addEventListener('load', () => {
     }
 
 })
+
+// document.body.appendChild(<div id="Editor">
+//     <Editor />
+// </div>)
