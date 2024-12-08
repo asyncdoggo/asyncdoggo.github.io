@@ -8,7 +8,6 @@ import back_btn from './assets/back.svg';
 import "./index.css"
 import "./userWorker"
 
-
 const blogs = [
     "/blogs/limits",
     "/blogs/python/intro",

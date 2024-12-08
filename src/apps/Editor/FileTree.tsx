@@ -220,15 +220,35 @@ export function FileTree(
             >
                 <div id="context-menu-item-delete"
                     onClick={(e: any) => {
-                        if (e.target.getAttribute('dir') == 'true') {
-                            deleteNode(e.target.getAttribute('data-delete-name')!, true);
+                        console.log(e.target.parentElement);
+                        
+                        if (e.target.parentElement.getAttribute('data-context-menu-dir') == 'true') {
+                            deleteNode(e.target.parentElement.getAttribute('data-context-menu-path')!, true);
                         }
                         else {
-                            deleteNode(e.target!.getAttribute('data-delete-name')!, false);
+                            deleteNode(e.target.parentElement.getAttribute('data-context-menu-path')!, false);
                         }
                     }}
                 >Delete</div>
-                <div id="context-menu-item-rename">Rename</div>
+                <div id="context-menu-item-rename"
+                onClick={(e: any) => {
+                    const newName = prompt('Enter new name: ') || '';
+                    if (newName === '') {
+                        return;
+                    }
+                    const oldPath = e.target.parentElement.getAttribute('data-context-menu-path')!;
+                    
+                    const newPath = oldPath.split('/').slice(0, -1).join('/') + '/' + newName;
+                    console.log(oldPath, newPath);
+                    
+                    FS('rename', { oldPath, newPath });
+                    removeNodeFromTree(oldPath, file_tree!);
+                    addNodeToTree(newPath, file_tree!, e.target.parentElement.getAttribute('data-context-menu-dir') === 'true');
+                    updateFileTree();
+                }}
+                >
+                    Rename
+                </div>
             </div>
 
         </div>
@@ -241,7 +261,7 @@ const fileSelected = (
     setCurrentFile: (file: string) => void,
     setCurrentFileData: (data: string) => void,
     e: any
-) => {
+) => {    
     if (file_tree.dir) {
         setCurrentSelectedFolder(file_tree.path);
     } else {
@@ -305,14 +325,9 @@ const buildTree = (
                         contextMenu.onclick = () => {
                             contextMenu.style.display = 'none';
                         }
-                        const deleteItem = document.getElementById('context-menu-item-delete')!;
-                        deleteItem.setAttribute('data-delete-name', file_tree.path);
-                        if (file_tree.dir) {
-                            deleteItem.setAttribute('dir', 'true');
-                        }
-                        else {
-                            deleteItem.removeAttribute('dir');
-                        }
+                       
+                        contextMenu.setAttribute('data-context-menu-path', file_tree.path);
+                        contextMenu.setAttribute('data-context-menu-dir', file_tree.dir ? 'true' : 'false');
                     }}
 
                 >

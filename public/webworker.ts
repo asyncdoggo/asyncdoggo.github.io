@@ -59,7 +59,7 @@ const recursiveBuild = (children: any, tree: any, path: string) => {
         name: child.name,
         path: path + "/" + child.name,
         dir: false,
-        contents: child.contents,
+        contents: {}, // no need to get contents since we use FS.read for now
         mode: child.mode,
         readmode: child.readMode,
         usedBytes: child.usedBytes,
@@ -113,6 +113,9 @@ Comlink.expose({
             break;
           case "rmdir":
             FS.rmdir(option.args.path);
+            break;
+          case "rename":
+            FS.rename(option.args.oldPath, option.args.newPath);
             break;
           case "tree":
             const data = FS.analyzePath(option.args.path);
