@@ -26,7 +26,7 @@ const initialize = async (pyodide: any) => {
 }
 
 
-const constructJSONForanalyzePath = (obj: any) => {
+const constructJSONForanalyzePath = (obj: any, data: boolean=false) => {
   const tree: any = {};
   let path = obj.path;
 
@@ -35,15 +35,15 @@ const constructJSONForanalyzePath = (obj: any) => {
     children.push(obj.object.contents[key]);
   }
 
-  return recursiveBuild(children, tree, path);
+  return recursiveBuild(children, tree, path, data);
 }
 
-const recursiveBuild = (children: any, tree: any, path: string) => {
+const recursiveBuild = (children: any, tree: any, path: string, data: boolean) => {
   for (let i in children) {
     const child = children[i];
     if (child.isFolder) {
       tree[child.name] = {};
-      const subTree = recursiveBuild(child.contents, tree[child.name], path + "/" + child.name);
+      const subTree = recursiveBuild(child.contents, tree[child.name], path + "/" + child.name, data);
       tree[child.name] = {
         name: child.name,
         path: path + "/" + child.name,
@@ -59,7 +59,7 @@ const recursiveBuild = (children: any, tree: any, path: string) => {
         name: child.name,
         path: path + "/" + child.name,
         dir: false,
-        contents: {}, // no need to have contents since files are read by FS.read for now
+        contents: data ? child.contents : {},
         mode: child.mode,
         readmode: child.readMode,
         usedBytes: child.usedBytes,
@@ -96,55 +96,61 @@ Comlink.expose({
       while (!synced) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
-      try {
-        switch (option.action) {
-          case "write":
-            FS.writeFile(option.args.path, option.args.data);
-            break;
-          case "read":
-            return FS.readFile(option.args.path, { encoding: "utf8" });
-          case "list":
-            return FS.readdir(option.args.path);
-          case "remove":
-            FS.unlink(option.args.path);
-            break;
-          case "mkdir":
-            FS.mkdir(option.args.path);
-            break;
-          case "rmdir":
-            FS.rmdir(option.args.path);
-            break;
-          case "rename":
-            FS.rename(option.args.oldPath, option.args.newPath);
-            break;
-          case "tree":
-            const data = FS.analyzePath(option.args.path);
-            const json = constructJSONForanalyzePath(data);
-            return {
-              name: 'root',
-              contents: json,
-              dir: true,
-              mode: 0,
-              path: '/home/pyodide',
-              readmode: 0,
-              usedBytes: 0
+      switch (option.action) {
+        case "write":
+          FS.writeFile(option.args.path, option.args.data, {flags: "w"});
+          break;
+        case "read":
+          return FS.readFile(option.args.path, { encoding: "utf8" });
+        case "list":
+          return FS.readdir(option.args.path);
+        case "remove":
+          FS.unlink(option.args.path);
+          break;
+        case "mkdir":
+          FS.mkdir(option.args.path);
+          break;
+        case "rmdir":
+          FS.rmdir(option.args.path);
+          break;
+        case "rename":
+          FS.rename(option.args.oldPath, option.args.newPath);
+          break;
+        case "tree":
+          const data = FS.analyzePath(option.args.path);
+          const json = constructJSONForanalyzePath(data);
+          return {
+            name: 'root',
+            contents: json,
+            dir: true,
+            mode: 0,
+            path: '/home/pyodide',
+            readmode: 0,
+            usedBytes: 0
+          }
+        case "stat":
+          return FS.stat(option.args.path);
+        case 'sync':
+          FS.syncfs(false, (err: any) => {
+            if (err) {
+              console.error(err);
             }
-          case "stat":
-            return FS.stat(option.args.path);
-          case 'sync':
-            FS.syncfs(false, (err: any) => {
-              if (err) {
-                console.error(err);
-              }
-            });
-            return "syncing";
-          default:
-            break;
-        }
-      }
-      catch (e) {
-        console.log("Error in FS", e);
-
+          });
+          return "syncing";
+        case 'download':
+          const data_down = FS.analyzePath(option.args.path);
+          const json_down = constructJSONForanalyzePath(data_down, true);
+          return {
+            name: 'root',
+            contents: json_down,
+            dir: true,
+            mode: 0,
+            path: '/home/pyodide',
+            readmode: 0,
+            usedBytes: 0
+          }
+        default:
+          break;
       }
     }
   ),

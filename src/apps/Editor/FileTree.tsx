@@ -4,6 +4,8 @@ import { Tree, FS, tree } from '../../utils/pyodide_helper';
 
 import new_file_icon from '../../assets/new-file.svg';
 import new_folder_icon from '../../assets/folder-new.svg';
+import { buildTree } from './BuildTree';
+import JSZip from 'jszip';
 
 export function FileTree(
     {
@@ -24,9 +26,7 @@ export function FileTree(
         currentSelectedFolder = folder
     }
 
-
     const fileTreeContentRef = React.useRef<HTMLDivElement>(null);
-
 
     const deleteNode = async (path: string, isFolder: boolean) => {
         if (isFolder) {
@@ -43,13 +43,25 @@ export function FileTree(
                 alert('Cannot delete main.py');
                 return;
             }
-            await FS('remove', { path: path });
+            try {
+                await FS('remove', { path: path });
+            }
+            catch (e) {
+                alert('File not found');
+                return;
+            }
         }
         removeNodeFromTree(path, file_tree!);
         updateFileTree();
-        if(currentFile === path) {
-            setCurrentFile('/home/pyodide/main.py');
-            setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
+        if (currentFile === path) {
+            try {
+                const data = await FS('read', { path: '/home/pyodide/main.py' })
+                setCurrentFile('/home/pyodide/main.py');
+                setCurrentFileData(data);
+            }
+            catch (e) {
+                alert('Something went wrong');
+            }
         }
     }
 
@@ -78,14 +90,32 @@ export function FileTree(
 
 
 
-    const new_file = (filename: string | null) => {
+    const new_file = async (filename: string | null) => {
         if (filename === null) {
             filename = prompt('Enter filename: ') || 'main.py';
         }
-        console.log(file_tree);
+        try {
+            FS('write', { path: `${currentSelectedFolder}/${filename}`, data: '' });
+        }
+        catch (e) {
+            alert('Error');
+            return;
+        }
         
-        FS('write', { path: `${currentSelectedFolder}/${filename}`, data: '' });
         addNodeToTree(`${currentSelectedFolder}/${filename}`, file_tree!, false);
+        updateFileTree();
+    }
+
+    const new_folder = () => {
+        const foldername = prompt('Enter folder name: ') || 'new_folder';
+        try {
+            FS('mkdir', { path: `${currentSelectedFolder}/${foldername}` });
+        }
+        catch (e) {
+            alert('Folder already exists');
+            return
+        }
+        addNodeToTree(`${currentSelectedFolder}/${foldername}`, file_tree!, true);
         updateFileTree();
     }
 
@@ -130,14 +160,6 @@ export function FileTree(
         }
     }
 
-    const new_folder = () => {
-        const foldername = prompt('Enter folder name: ') || 'new_folder';        
-        FS('mkdir', { path: `${currentSelectedFolder}/${foldername}` });
-        addNodeToTree(`${currentSelectedFolder}/${foldername}`, file_tree!, true);
-        updateFileTree();
-    }
-
-
     const renameNodeInTree = (oldPath: string, newPath: string, tree: Tree) => {
         for (const key in tree.contents) {
             const child = tree.contents[key] as Tree;
@@ -157,7 +179,7 @@ export function FileTree(
                 return true;
             }
             if (child.dir) {
-                if (renameNodeInTree(oldPath, newPath, child)){
+                if (renameNodeInTree(oldPath, newPath, child)) {
                     return;
                 }
             }
@@ -184,32 +206,43 @@ export function FileTree(
 
         // If tree is empty, create it
         if (Object.keys(file_tree!.contents).length === 0) {
-            FS('write', { path: '/home/pyodide/main.py', data: '' });
-            file_tree = {
-                "name": "root",
-                "contents": {
-                    "main.py": {
-                        "name": "main.py",
-                        "path": "/home/pyodide/main.py",
-                        "dir": false,
-                        "contents": null,
-                        "mode": 33206,
-                        "readmode": 365,
-                        "usedBytes": 0
+            try {
+                await FS('write', { path: '/home/pyodide/main.py', data: '' });
+                file_tree = {
+                    "name": "root",
+                    "contents": {
+                        "main.py": {
+                            "name": "main.py",
+                            "path": "/home/pyodide/main.py",
+                            "dir": false,
+                            "contents": null,
+                            "mode": 33206,
+                            "readmode": 365,
+                            "usedBytes": 0
+                        },
                     },
-                },
-                "dir": true,
-                "mode": 0,
-                "path": "/home/pyodide",
-                "readmode": 0,
-                "usedBytes": 0
+                    "dir": true,
+                    "mode": 0,
+                    "path": "/home/pyodide",
+                    "readmode": 0,
+                    "usedBytes": 0
+                }
+            }
+            catch (e) {
+                alert('Something went wrong');
             }
         }
 
         updateFileTree();
-        currentSelectedFolder = '/home/pyodide';
-        setCurrentFile('/home/pyodide/main.py');
-        setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
+        try {
+            const data = await FS('read', { path: '/home/pyodide/main.py' })
+            currentSelectedFolder = '/home/pyodide';
+            setCurrentFile('/home/pyodide/main.py');
+            setCurrentFileData(data);
+        }
+        catch (e) {
+            alert('Something went wrong');
+        }
 
 
         document.getElementById('py_upload')!.addEventListener('change', (e: Event) => {
@@ -218,28 +251,62 @@ export function FileTree(
             const reader = new FileReader();
             reader.onload = (e) => {
                 const data = e.target!.result as string;
-                setCurrentFileData(data);
-                setCurrentFile(file.name);
-                FS('write', { path: `/home/pyodide/${file.name}`, data });
-                addNodeToTree(`/home/pyodide/${file.name}`, file_tree!, false);
-                updateFileTree();
+                try {
+                    FS('write', { path: `/home/pyodide/${file.name}`, data });
+                    setCurrentFileData(data);
+                    setCurrentFile(file.name);
+                    addNodeToTree(`/home/pyodide/${file.name}`, file_tree!, false);
+                    updateFileTree();
 
-                // css selector to select the file tree node
-                const selectedElements = document.querySelectorAll('.selected');
-                selectedElements.forEach((element) => {
-                    element.classList.remove('selected');
-                });
-                const selector = `[data-name="/home/pyodide/${file.name}"]`;
-                const element = document.querySelector(selector);
-                element?.classList.add('selected');
-                // remove selected class from all elements
+                    // css selector to select the file tree node
+                    const selectedElements = document.querySelectorAll('.selected');
+                    selectedElements.forEach((element) => {
+                        element.classList.remove('selected');
+                    });
+                    const selector = `[data-name="/home/pyodide/${file.name}"]`;
+                    const element = document.querySelector(selector);
+                    element?.classList.add('selected');
+                    // remove selected class from all elements
+                }
+                catch (e) {
+                    alert('Something went wrong, perhaps a file with the same name already exists');
+                }
             }
             reader.readAsText(file);
         });
 
+        document.getElementById("editor_download_button")!.addEventListener('click', async () => {
+            const data = await FS('download', { path: '/home/pyodide'});
+            // recursively build the file tree and zip it
+            const zip = new JSZip();
+            buildZip(zip, data);
+            zip.generateAsync({ type: "blob" }).then((content) => {
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'project.zip';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+        });
+
+        const buildZip = (zip: JSZip, tree: Tree) => {
+            for (const key in tree.contents) {
+                const child = tree.contents[key] as Tree;
+                if (child.dir) {
+                    const folder = zip.folder(child.name);
+                    buildZip(folder!, child);
+                }
+                else {
+                    // convert tree.contents from uint8array to string                    
+                    const data = new TextDecoder().decode(child.contents as unknown as Uint8Array || new Uint8Array());
+                    zip.file(child.name, data);
+                }
+            }
+        }
+
     });
-
-
 
     return (
         <div
@@ -271,8 +338,40 @@ export function FileTree(
             <div id="context-menu-for-file-tree" className="absolute bg-gray-800 text-white p-2 rounded-md"
                 style={{ display: 'none' }}
             >
+                <div id="context-menu-item-copy"
+                    onClick={async (e: any) => {
+                        const path = e.target.parentElement.getAttribute('data-context-menu-path')!;
+                        await navigator.clipboard.write(
+                            [new ClipboardItem({
+                                'text/plain': new Blob([JSON.stringify({ path })], { type: 'text/plain' })
+                            })]
+                        );
+                    }}
+                >
+                    Copy
+                </div>
+
+                <div id="context-menu-item-paste"
+                    onClick={async (e: any) => {
+                        try {
+
+                            const path = e.target.parentElement.getAttribute('data-context-menu-path')!;
+                            const copiedPath = JSON.parse(await navigator.clipboard.readText()).path;
+
+                            const data = await FS('read', { path: copiedPath });
+                            await FS('write', { path: `${path}/${copiedPath.split('/').pop()}`, data });
+                            addNodeToTree(`${path}/${copiedPath.split('/').pop()}`, file_tree!, false);
+                            updateFileTree();
+                        } catch (e) {
+                            alert('No file copied');
+                        }
+                    }}
+                >
+                    Paste
+                </div>
+
                 <div id="context-menu-item-delete"
-                    onClick={(e: any) => {                        
+                    onClick={(e: any) => {
                         if (e.target.parentElement.getAttribute('data-context-menu-dir') == 'true') {
                             deleteNode(e.target.parentElement.getAttribute('data-context-menu-path')!, true);
                         }
@@ -280,24 +379,29 @@ export function FileTree(
                             deleteNode(e.target.parentElement.getAttribute('data-context-menu-path')!, false);
                         }
                     }}
-                >Delete</div>
-                <div id="context-menu-item-rename"
-                onClick={(e: any) => {
-                    const newName = prompt('Enter new name: ') || '';
-                    if (newName === '') {
-                        return;
-                    }
-                    const oldPath = e.target.parentElement.getAttribute('data-context-menu-path')!;
-                    
-                    const newPath = oldPath.split('/').slice(0, -1).join('/') + '/' + newName;
-                    
-                    FS('rename', { oldPath, newPath });
+                >
+                    Delete
+                </div>
 
-                    renameNodeInTree(oldPath, newPath, file_tree!);
-                    setCurrentSelectedFolder(newPath);
-                    
-                    updateFileTree();
-                }}
+                <div id="context-menu-item-rename"
+                    onClick={async (e: any) => {
+                        const newName = prompt('Enter new name: ') || '';
+                        if (newName === '') {
+                            return;
+                        }
+                        const oldPath = e.target.parentElement.getAttribute('data-context-menu-path')!;
+
+                        const newPath = oldPath.split('/').slice(0, -1).join('/') + '/' + newName;
+                        try {
+                            await FS('rename', { oldPath, newPath });
+                            renameNodeInTree(oldPath, newPath, file_tree!);
+                            setCurrentSelectedFolder(newPath);
+                            updateFileTree();
+                        }
+                        catch (e) {
+                            alert('File or folder with the same name already exists');
+                        }
+                    }}
                 >
                     Rename
                 </div>
@@ -305,118 +409,4 @@ export function FileTree(
 
         </div>
     )
-}
-
-const fileSelected = (
-    file_tree: Tree,
-    setCurrentSelectedFolder: (folder: string) => void,
-    setCurrentFile: (file: string) => void,
-    setCurrentFileData: (data: string) => void,
-    e: any
-) => {        
-    if (file_tree.dir) {
-        setCurrentSelectedFolder(file_tree.path);
-    } else {
-        setCurrentFile(file_tree.path);
-        FS('read', { path: file_tree.path }).then((data: string) => {
-            setCurrentFileData(data);
-        });
-    }
-
-    // remove selected class from all elements
-    const selectedElements = document.querySelectorAll('.file-tree-node-name');
-    selectedElements.forEach((element) => {
-        element.classList.remove('selected');
-    });
-
-    // add selected class to the clicked element
-    e.currentTarget.classList.add('selected');
-}
-
-
-const buildTree = (
-    file_tree: Tree,
-    setCurrentSelectedFolder: (folder: string) => void,
-    setCurrentFile: (file: string) => void,
-    setCurrentFileData: (data: string) => void,
-) => {
-    if (file_tree.path === '/home/pyodide') {
-        return (
-            <>
-                {Object.values(file_tree.contents || {}).map((child, index) => (
-                    <React.Fragment key={index}>
-                        {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData)}
-                    </React.Fragment>
-                ))}
-            </>
-        )
-    }
-
-
-    return (
-        <div className="file-tree-node w-full flex flex-col justify-center items-start">
-            <div className="flex flex-col w-full justify-between">
-                <div className={"file-tree-node-name w-full justify-between flex flex-row" + (file_tree.path === "/home/pyodide/main.py" ? " selected" : "")}
-                    data-name={file_tree.path}
-                    onClick={(e) => {
-                        fileSelected(
-                            file_tree,
-                            setCurrentSelectedFolder,
-                            setCurrentFile,
-                            setCurrentFileData,
-                            e
-                        )
-                    }}
-                    onContextMenu={(e) => {
-                        e.preventDefault();
-                        // show context menu
-                        const contextMenu = document.getElementById('context-menu-for-file-tree')!;
-                        contextMenu.style.display = 'block';
-                        contextMenu.style.left = `${e.clientX}px`;
-                        contextMenu.style.top = `${e.clientY}px`;
-                        contextMenu.onclick = () => {
-                            contextMenu.style.display = 'none';
-                        }
-                       
-                        contextMenu.setAttribute('data-context-menu-path', file_tree.path);
-                        contextMenu.setAttribute('data-context-menu-dir', file_tree.dir ? 'true' : 'false');
-                    }}
-
-                >
-                    {file_tree.name}
-                    {
-                        file_tree.dir ?
-                            (
-                                <div className="file-tree-node-dropdown" onClick={() => {
-                                    const children = document.getElementById(file_tree.path)!;
-                                    if (children.style.display === 'none') {
-                                        children.style.display = 'block';
-                                    } else {
-                                        children.style.display = 'none';
-                                    }
-                                }}>
-                                    ▼
-                                </div>
-                            )
-                            :
-                            null
-                    }
-                </div>
-
-                {file_tree.dir && (
-                    <div
-                        className="file-tree-children pl-2"
-                        style={{ display: 'none' }}
-                        id={file_tree.path}
-                    >
-                        {Object.values(file_tree.contents || {}).map((child, index) => (
-                            <React.Fragment key={index}>
-                                {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData)}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
 }

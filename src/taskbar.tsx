@@ -46,7 +46,6 @@ export function updateTaskBar() {
                 onContextMenu={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('right click');
 
                     // find mouse position and open context menu
                     const contextMenu = document.getElementById('context-menu')

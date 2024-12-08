@@ -228,6 +228,10 @@ export default function Editor() {
                         <input type="file" id="py_upload" className="hidden" />
                     </div>
 
+                    <div className="download flex flex-row gap-x-4 select-none m-2 cursor-pointer bg-yellow-500 text-white text-center p-2">
+                        <button id='editor_download_button'>Download Zip</button>
+                    </div>
+
                 </div>
 
                 <div className="output flex-grow">

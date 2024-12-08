@@ -31,6 +31,7 @@
     "comsync": "^0.0.9",
     "jquery.terminal": "^2.44.1",
     "jsx-dom": "^8.1.4",
+    "jszip": "^3.10.1",
     "mathjs": "^13.1.1",
     "monaco-editor": "^0.52.0",
     "pyodide": "^0.26.4",
