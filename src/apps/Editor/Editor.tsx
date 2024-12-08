@@ -235,14 +235,28 @@ function FileTree(
             alert('Cannot delete main.py');
             return;
         }
-        FS('remove', { path: path });
+        await FS('remove', { path: path });
         // update file_tree
 
-        removeFileFromTree(path, file_tree!);
+        removeNodeFromTree(path, file_tree!);
         updateFileTree();
     }
 
-    const removeFileFromTree = (path: string, tree: Tree) => {
+    const deleteFolder = async (path: string) => {
+        try{
+            await FS('rmdir', { path: path });
+        }
+        catch(e){
+            alert('Folder not empty');
+            return;
+        }
+        removeNodeFromTree(path, file_tree!);
+        updateFileTree();
+    }
+
+
+
+    const removeNodeFromTree = (path: string, tree: Tree) => {
         for (const key in tree.contents) {
             const child = tree.contents[key] as Tree;
             if (child.path === path) {
@@ -250,7 +264,7 @@ function FileTree(
                 return;
             }
             if (child.dir) {
-                removeFileFromTree(path, child);
+                removeNodeFromTree(path, child);
             }
         }
     }
@@ -276,8 +290,6 @@ function FileTree(
                     <div className="file-tree-node-name w-full justify-between flex flex-row"
                         onClick={() => {
                             if (file_tree.dir) {
-                                console.log(file_tree.path);
-
                                 currentSelectedFolder = file_tree.path;
                             } else {
                                 setCurrentFile(file_tree.path);
@@ -285,7 +297,28 @@ function FileTree(
                                     setCurrentFileData(data);
                                 });
                             }
-                        }}>
+                        }}
+                        onContextMenu={(e) => {
+                            e.preventDefault();
+                            // show context menu
+                            const contextMenu = document.getElementById('context-menu-for-file-tree')!;
+                            contextMenu.style.display = 'block';
+                            contextMenu.style.left = `${e.clientX}px`;
+                            contextMenu.style.top = `${e.clientY}px`;
+                            contextMenu.onclick = () => {
+                                contextMenu.style.display = 'none';
+                            }
+                            const deleteItem = document.getElementById('context-menu-item-delete')!;
+                            deleteItem.setAttribute('data-name', file_tree.path);
+                            if (file_tree.dir) {
+                                deleteItem.setAttribute('dir', 'true');
+                            }
+                            else {
+                                deleteItem.removeAttribute('dir');
+                            }
+                        }}
+                        
+                        >
                         {file_tree.name}
                         {
                             file_tree.dir ?
@@ -341,8 +374,6 @@ function FileTree(
     waitForElementFromRef(fileTreeContentRef, async () => {
         file_tree = await tree;
         updateFileTree();
-        console.log(file_tree);
-
         currentSelectedFolder = '/home/pyodide';
         setCurrentFile('/home/pyodide/main.py');
         setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
@@ -354,10 +385,7 @@ function FileTree(
             filename = prompt('Enter filename: ') || 'main.py';
         }
         FS('write', { path: `${currentSelectedFolder}/${filename}`, data: '' });
-
         addFileToTree(`${currentSelectedFolder}/${filename}`, file_tree!);
-        console.log(file_tree);
-
         updateFileTree();
     }
 
@@ -494,6 +522,23 @@ function FileTree(
                 ref={fileTreeContentRef}
             >
                 loading...
+            </div>
+
+            <div id="context-menu-for-file-tree" className="absolute bg-gray-800 text-white p-2 rounded-md"
+                style={{ display: 'none' }}
+            >
+                <div id="context-menu-item-delete"
+                    onClick={(e: any) => {
+                        // delete file, name is in the data-name attribute                        
+                        if (e.target.getAttribute('dir') == 'true'){
+                            deleteFolder(e.target.getAttribute('data-name')!);
+                        }
+                        else{
+                            deleteFile(e.target!.getAttribute('data-name')!);
+                        }
+                    }}
+                >Delete</div>
+                <div id="context-menu-item-rename">Rename</div>
             </div>
 
         </div>
