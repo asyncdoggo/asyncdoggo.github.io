@@ -12,6 +12,19 @@ const py = new PyodideClient(
 
 );
 
+export type Tree = {
+    name: string
+    path: string,
+    dir: boolean,
+    contents: { [key: string]: Tree | File | {} };
+    [key: string]: any;
+    mode: number,
+    readmode: number,
+    usedBytes: number,
+}
+
+export const tree: Promise<Tree> = fetchTree();
+
 
 setInterval(() => {
     if (py.state === "awaitingMessage") {
@@ -34,4 +47,12 @@ export async function FS(action: string, args: any) {
         await new Promise((resolve) => setTimeout(resolve, 100));
     }
     return await py.call(py.workerProxy.FS, { action, args });
+}
+
+
+
+
+async function fetchTree() {
+    const tree = await py.call(py.workerProxy.FS, { action: "tree", args: { path: "/home/pyodide" } });    
+    return tree;
 }

@@ -1,10 +1,12 @@
 import * as React from 'jsx-dom';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { waitForElementFromRef } from '../../globals';
-import { asyncRun, FS } from '../../utils/pyodide_helper';
+import { asyncRun, FS, Tree, tree } from '../../utils/pyodide_helper';
 import run_btn from '../../assets/runbtn.svg';
 import new_file_icon from '../../assets/new-file.svg';
 import new_folder_icon from '../../assets/folder-new.svg';
+
+
 
 export default function Editor() {
     let editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -22,8 +24,9 @@ export default function Editor() {
 
     let loading = false;
 
-    let currentFile = 'main.py';
+    let currentFile = '/home/pyodide/main.py';
     let currentFileData = '';
+    let currentSelectedFolder = '';
 
     const setCurrentFile = (file: string) => {
         currentFile = file;
@@ -34,7 +37,6 @@ export default function Editor() {
         currentFileData = data;
         editor?.setValue(data);
     }
-
 
     waitForElementFromRef(monacoEl, () => {
         if (monacoEl && !editor) {
@@ -100,8 +102,6 @@ export default function Editor() {
             if (w < 100) {
                 return;
             }
-            console.log(w);
-            
             if (w > document.getElementById('Editor')!.clientWidth - 100) {
                 return;
             }
@@ -122,18 +122,19 @@ export default function Editor() {
         window.addEventListener('mouseup', onMouseUp);
     }
 
-    const saveFile = () => {
+    const saveFile = (path: string) => {
         const value = editor?.getValue();
         currentFileData = value!;
         showSavedPopup();
-        FS('write', { path: `/home/pyodide/${currentFile}`, data: value });
+        FS('write', { path: path, data: value });
         FS('sync', {});
     }
 
     window.addEventListener('keydown', (e) => {
+
         if (e.key === 's' && e.ctrlKey) {
             e.preventDefault();
-            saveFile();
+            saveFile(currentFile);
         }
     })
 
@@ -171,7 +172,7 @@ export default function Editor() {
                     <FileTree
                         setCurrentFile={setCurrentFile}
                         setCurrentFileData={setCurrentFileData}
-
+                        currentSelectedFolder={currentSelectedFolder}
                     />
                     <div className="divider bg-red-900 px-2 h-auto cursor-ew-resize"
                         onMouseDown={onMouseDownFileTree}
@@ -216,75 +217,258 @@ export default function Editor() {
 function FileTree(
     {
         setCurrentFile,
-        setCurrentFileData
+        setCurrentFileData,
+        currentSelectedFolder,
     }: {
         setCurrentFile: (file: string) => void,
         setCurrentFileData: (data: string) => void,
+        currentSelectedFolder: string,
     }
 ) {
+
+    let file_tree: Tree | null = null;
+
     const fileTreeContentRef = React.useRef<HTMLDivElement>(null);
 
-
-    const deleteFile = (filename: string) => {
-        if (filename === 'main.py') {
+    const deleteFile = async (path: string) => {
+        if (path === '/home/pyodide/main.py') {
             alert('Cannot delete main.py');
             return;
         }
-        FS('remove', { path: `/home/pyodide/${filename}` });
+        FS('remove', { path: path });
+        // update file_tree
+
+        removeFileFromTree(path, file_tree!);
         updateFileTree();
     }
 
-    const updateFileTree = async () => {
-        const res = await FS('list', { path: '/home/pyodide' });
-        const fileTreeContent = fileTreeContentRef.current!;
-        fileTreeContent.innerHTML = "";
-
-        const ul = <ul></ul>;
-        fileTreeContent.appendChild(ul);
-        for (const file of res) {
-            if (file !== '..' && file !== '.') {
-                const li =
-                    <li
-                        className="cursor-pointer w-full flex flex-row justify-between"
-                        onClick={() => {
-                            FS('read', { path: `/home/pyodide/${file}` }).then((res) => {
-                                setCurrentFile(file);
-                                setCurrentFileData(res);
-                            });
-                        }}
-                    >
-                        {file}
-                        <span className="text-red-600"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                deleteFile(file);
-                            }
-                            }
-                        >
-                            X
-                        </span>
-                    </li>;
-                ul.appendChild(li);
+    const removeFileFromTree = (path: string, tree: Tree) => {
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.path === path) {
+                delete tree.contents[key];
+                return;
             }
-        }
-
-        // set current file to main.py if nothing exists
-        if (res.length === 2) {
-            setCurrentFile('main.py');
-            setCurrentFileData('');
-            new_file('main.py');
+            if (child.dir) {
+                removeFileFromTree(path, child);
+            }
         }
     }
 
-    waitForElementFromRef(fileTreeContentRef, updateFileTree);
+
+
+    const buildTree = (file_tree: Tree) => {
+        if (file_tree.path === '/home/pyodide') {
+            return (
+                <>
+                    {Object.values(file_tree.contents || {}).map((child, index) => (
+                        <React.Fragment key={index}>
+                            {buildTree(child as Tree)}
+                        </React.Fragment>
+                    ))}
+                </>
+            )
+        }
+
+        return (
+            <div className="file-tree-node w-full flex flex-col justify-center items-start">
+                <div className="flex flex-col w-full justify-between">
+                    <div className="file-tree-node-name w-full justify-between flex flex-row"
+                        onClick={() => {
+                            if (file_tree.dir) {
+                                console.log(file_tree.path);
+
+                                currentSelectedFolder = file_tree.path;
+                            } else {
+                                setCurrentFile(file_tree.path);
+                                FS('read', { path: file_tree.path }).then((data: string) => {
+                                    setCurrentFileData(data);
+                                });
+                            }
+                        }}>
+                        {file_tree.name}
+                        {
+                            file_tree.dir ?
+                                (
+                                    <div className="file-tree-node-dropdown" onClick={() => {
+                                        const children = document.getElementById(file_tree.path)!;
+                                        if (children.style.display === 'none') {
+                                            children.style.display = 'block';
+                                        } else {
+                                            children.style.display = 'none';
+                                        }
+                                    }}>
+                                        ▼
+                                    </div>
+                                )
+                                :
+                                (
+                                    <button className="file-tree-delete-button" onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteFile(file_tree.path);
+                                    }}>
+                                        ❌
+                                    </button>
+                                )
+                        }
+                    </div>
+
+                    {file_tree.dir && (
+                        <div
+                            className="file-tree-children pl-2"
+                            style={{ display: 'none' }}
+                            id={file_tree.path}
+                        >
+                            {Object.values(file_tree.contents || {}).map((child, index) => (
+                                <React.Fragment key={index}>
+                                    {buildTree(child as Tree)}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    const updateFileTree = async () => {
+        // build the dom using tree imported from pyodide_helper
+        const treeElement = buildTree(file_tree!);
+        fileTreeContentRef.current!.innerHTML = '';
+        fileTreeContentRef.current!.appendChild(treeElement);
+    }
+
+    waitForElementFromRef(fileTreeContentRef, async () => {
+        file_tree = await tree;
+        updateFileTree();
+        console.log(file_tree);
+
+        currentSelectedFolder = '/home/pyodide';
+        setCurrentFile('/home/pyodide/main.py');
+        setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
+    });
+
 
     const new_file = (filename: string | null) => {
         if (filename === null) {
             filename = prompt('Enter filename: ') || 'main.py';
         }
-        FS('write', { path: `/home/pyodide/${filename}`, data: '' });
+        FS('write', { path: `${currentSelectedFolder}/${filename}`, data: '' });
+
+        addFileToTree(`${currentSelectedFolder}/${filename}`, file_tree!);
+        console.log(file_tree);
+
         updateFileTree();
     }
+
+    const addFileToTree = (path: string, tree: Tree, depth: number = 0) => {
+        // Find the folder in which the file is to be added
+        const filename = path.split('/').pop()!;
+        const folderPath = path.split('/').slice(3, -1) // 3 to ignore /home/pyodide(plus empty string at the start) and -1 to ignore the filename
+
+
+
+        // base case, if the path is /home/pyodide
+        if (currentSelectedFolder === '/home/pyodide') {
+            tree.contents[filename] = {
+                name: filename,
+                path: path,
+                dir: false,
+                contents: {},
+                mode: 0,
+                readmode: 0,
+                usedBytes: 0,
+            };
+            return;
+        }
+
+        // recursive case
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.dir) {
+
+                // check for depth to find the correct folder
+
+                if (child.path === currentSelectedFolder) {
+                    child.contents[filename] = {
+                        name: filename,
+                        path: path,
+                        dir: false,
+                        contents: {},
+                        mode: 0,
+                        readmode: 0,
+                        usedBytes: 0,
+                    };
+                    return true;
+                }
+                if (folderPath[depth] === child.name) {
+                    if (addFileToTree(path, child, depth + 1)) {
+                        return;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    const addFolderToTree = (path: string, tree: Tree, depth: number = 0) => {
+        const foldername = path.split('/').pop()!;
+        const folderPath = path.split('/').slice(3, -1) // 3 to ignore /home/pyodide(plus empty string at the start) and -1 to ignore the foldername
+
+        // base case, if the path is /home/pyodide
+        if (currentSelectedFolder === '/home/pyodide') {
+            tree.contents[foldername] = {
+                name: foldername,
+                path: path,
+                dir: true,
+                contents: {},
+                mode: 0,
+                readmode: 0,
+                usedBytes: 0,
+            };
+            return true;
+        }
+
+        // recursive case
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.dir) {
+
+                // check for depth to find the correct folder
+
+                if (child.path === currentSelectedFolder) {
+                    child.contents[foldername] = {
+                        name: foldername,
+                        path: path,
+                        dir: true,
+                        contents: {},
+                        mode: 0,
+                        readmode: 0,
+                        usedBytes: 0,
+                    };
+                    return true;
+                }
+                if (folderPath[depth] === child.name) {
+                    if (addFolderToTree(path, child, depth + 1)) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+    const new_folder = () => {
+        const foldername = prompt('Enter folder name: ') || 'new_folder';
+        FS('mkdir', { path: `${currentSelectedFolder}/${foldername}` });
+        addFolderToTree(`${currentSelectedFolder}/${foldername}`, file_tree!);
+        updateFileTree();
+    }
+
+
     return (
         <div
             className="file-tree flex flex-col bg-gray-900 px-4 text-white"
@@ -297,7 +481,9 @@ function FileTree(
                 >
                     <img src={new_file_icon} alt="New File" className="w-6 h-6 invert" />
                 </button>
-                <button className="">
+                <button className=""
+                    onClick={() => new_folder()}
+                >
                     <img src={new_folder_icon} alt="New Folder" className="w-6 h-6 invert" />
                 </button>
             </div>

@@ -4,7 +4,7 @@ import { initPyodide, defaultPyodideLoader } from "pyodide-worker-runner";
 
 let pyodideReadyPromise = defaultPyodideLoader();
 let initialized = false;
-
+let synced = false;
 const initialize = async (pyodide: any) => {
   if (!initialized) {
     initPyodide(pyodide);
@@ -14,32 +14,88 @@ const initialize = async (pyodide: any) => {
     FS.mount(FS.filesystems.IDBFS, {
       root: ".",
     }, "/home/pyodide");
-    await FS.syncfs(true, (err: any) => {});
+    await FS.syncfs(true, (err: any) => {
+      if (err) {
+        console.error(err);
+      } else {
+        synced = true;
+      }
+    });
   }
   return pyodide;
 }
 
+
+const constructJSONForanalyzePath = (obj: any) => {
+    const tree: any = {};
+  let path = obj.path;
+  
+  const children: any = []
+  for (let key in obj.object.contents) {
+    children.push(obj.object.contents[key]);
+  }
+
+  return recursiveBuild(children, tree, path);
+}
+
+const recursiveBuild = (children: any, tree: any, path: string) => {
+  for (let i in children) {
+    const child = children[i];
+    if (child.isFolder) {
+      tree[child.name] = {};
+      const subTree = recursiveBuild(child.contents, tree[child.name], path + "/" + child.name);
+      tree[child.name] = {
+        name: child.name,
+        path: path + "/" + child.name,
+        dir: true,
+        contents: subTree,
+        mode: child.mode,
+        readmode: child.readMode,
+        usedBytes: child.usedBytes,
+      };
+    }
+    else {
+      tree[child.name] = {
+        name: child.name,
+        path: path + "/" + child.name,
+        dir: false,
+        contents: child.contents,
+        mode: child.mode,
+        readmode: child.readMode,
+        usedBytes: child.usedBytes,
+        
+      };
+    }
+  }
+  return tree;
+}
+
+
+
 Comlink.expose({
   runPython: pyodideExpose(async (extras, code, inline) => {
     const pyodide = await pyodideReadyPromise;
-      if (!initialized) {
-        await initialize(pyodide);
-      }
+    if (!initialized) {
+      await initialize(pyodide);
+    }
     return execute(extras, code, inline);
   }),
   FS: pyodideExpose(
-   async (
+    async (
       extras,
       option: {
-              action: string,
-              args: any
-              }
+        action: string,
+        args: any
+      }
     ) => {
       const pyodide = await pyodideReadyPromise;
       if (!initialized) {
         await initialize(pyodide);
       }
       const FS = pyodide.FS;
+      while (!synced) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
 
       switch (option.action) {
         case "write":
@@ -58,8 +114,18 @@ Comlink.expose({
         case "rmdir":
           FS.rmdir(option.args.path);
           break;
-        case "exists":
-          return FS.analyzePath(option.args.path).exists;
+        case "tree":
+          const data = FS.analyzePath(option.args.path);
+          const json = constructJSONForanalyzePath(data);
+          return {
+              name: 'root',
+              contents: json,
+              dir: true,
+              mode: 0,
+              path: '/home/pyodide',
+              readmode: 0,
+              usedBytes: 0
+          }
         case "stat":
           return FS.stat(option.args.path);
         case 'sync':
@@ -72,7 +138,7 @@ Comlink.expose({
         default:
           break;
       }
-    } 
+    }
   ),
   waitUntilReady: async () => {
     await pyodideReadyPromise;
