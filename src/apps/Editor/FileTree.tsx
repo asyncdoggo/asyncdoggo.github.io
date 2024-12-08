@@ -9,9 +9,11 @@ export function FileTree(
     {
         setCurrentFile,
         setCurrentFileData,
+        currentFile,
     }: {
         setCurrentFile: (file: string) => void,
         setCurrentFileData: (data: string) => void,
+        currentFile: string,
     }
 ) {
 
@@ -25,28 +27,30 @@ export function FileTree(
 
     const fileTreeContentRef = React.useRef<HTMLDivElement>(null);
 
-    const deleteFile = async (path: string) => {
-        if (path === '/home/pyodide/main.py') {
-            alert('Cannot delete main.py');
-            return;
-        }
-        await FS('remove', { path: path });
-        // update file_tree
 
+    const deleteNode = async (path: string, isFolder: boolean) => {
+        if (isFolder) {
+            try {
+                await FS('rmdir', { path: path });
+            }
+            catch (e) {
+                alert('Folder not empty');
+                return;
+            }
+        }
+        else {
+            if (path === '/home/pyodide/main.py') {
+                alert('Cannot delete main.py');
+                return;
+            }
+            await FS('remove', { path: path });
+        }
         removeNodeFromTree(path, file_tree!);
         updateFileTree();
-    }
-
-    const deleteFolder = async (path: string) => {
-        try {
-            await FS('rmdir', { path: path });
+        if(currentFile === path) {
+            setCurrentFile('/home/pyodide/main.py');
+            setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
         }
-        catch (e) {
-            alert('Folder not empty');
-            return;
-        }
-        removeNodeFromTree(path, file_tree!);
-        updateFileTree();
     }
 
 
@@ -67,7 +71,7 @@ export function FileTree(
 
     const updateFileTree = async () => {
         // build the dom using tree imported from pyodide_helper
-        const treeElement = buildTree(file_tree!, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData, deleteFile);
+        const treeElement = buildTree(file_tree!, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData);
         fileTreeContentRef.current!.innerHTML = '';
         fileTreeContentRef.current!.appendChild(treeElement);
     }
@@ -153,6 +157,33 @@ export function FileTree(
         currentSelectedFolder = '/home/pyodide';
         setCurrentFile('/home/pyodide/main.py');
         setCurrentFileData(await FS('read', { path: '/home/pyodide/main.py' }));
+
+
+        document.getElementById('py_upload')!.addEventListener('change', (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            const file = target.files![0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target!.result as string;
+                setCurrentFileData(data);
+                setCurrentFile(file.name);
+                FS('write', { path: `/home/pyodide/${file.name}`, data });
+                addNodeToTree(`/home/pyodide/${file.name}`, file_tree!, false);
+                updateFileTree();
+
+                // css selector to select the file tree node
+                const selectedElements = document.querySelectorAll('.selected');
+                selectedElements.forEach((element) => {
+                    element.classList.remove('selected');
+                });
+                const selector = `[data-name="/home/pyodide/${file.name}"]`;
+                const element = document.querySelector(selector);
+                element?.classList.add('selected');
+                // remove selected class from all elements
+            }
+            reader.readAsText(file);
+        });
+
     });
 
 
@@ -189,12 +220,11 @@ export function FileTree(
             >
                 <div id="context-menu-item-delete"
                     onClick={(e: any) => {
-                        // delete file, name is in the data-name attribute                        
                         if (e.target.getAttribute('dir') == 'true') {
-                            deleteFolder(e.target.getAttribute('data-name')!);
+                            deleteNode(e.target.getAttribute('data-delete-name')!, true);
                         }
                         else {
-                            deleteFile(e.target!.getAttribute('data-name')!);
+                            deleteNode(e.target!.getAttribute('data-delete-name')!, false);
                         }
                     }}
                 >Delete</div>
@@ -237,14 +267,13 @@ const buildTree = (
     setCurrentSelectedFolder: (folder: string) => void,
     setCurrentFile: (file: string) => void,
     setCurrentFileData: (data: string) => void,
-    deleteFile: (path: string) => void
 ) => {
     if (file_tree.path === '/home/pyodide') {
         return (
             <>
                 {Object.values(file_tree.contents || {}).map((child, index) => (
                     <React.Fragment key={index}>
-                        {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData, deleteFile)}
+                        {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData)}
                     </React.Fragment>
                 ))}
             </>
@@ -256,6 +285,7 @@ const buildTree = (
         <div className="file-tree-node w-full flex flex-col justify-center items-start">
             <div className="flex flex-col w-full justify-between">
                 <div className={"file-tree-node-name w-full justify-between flex flex-row" + (file_tree.path === "/home/pyodide/main.py" ? " selected" : "")}
+                    data-name={file_tree.path}
                     onClick={(e) => {
                         fileSelected(
                             file_tree,
@@ -276,7 +306,7 @@ const buildTree = (
                             contextMenu.style.display = 'none';
                         }
                         const deleteItem = document.getElementById('context-menu-item-delete')!;
-                        deleteItem.setAttribute('data-name', file_tree.path);
+                        deleteItem.setAttribute('data-delete-name', file_tree.path);
                         if (file_tree.dir) {
                             deleteItem.setAttribute('dir', 'true');
                         }
@@ -314,7 +344,7 @@ const buildTree = (
                     >
                         {Object.values(file_tree.contents || {}).map((child, index) => (
                             <React.Fragment key={index}>
-                                {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData, deleteFile)}
+                                {buildTree(child as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData)}
                             </React.Fragment>
                         ))}
                     </div>

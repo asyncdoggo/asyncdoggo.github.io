@@ -172,11 +172,11 @@ export default function Editor() {
         }
     }
 
-    waitForElementFromRef(mainContainer, () => {
+
+    waitForElementFromRef(mainContainer, () => {        
+        // listener stuff
         window.addEventListener('keydown', keyDownListener);
-    
         document.addEventListener('click', removeClass);
-    
         (document.getElementById('Editor_inner')! as any).onCleanUp = () => {
             editor?.dispose();
             document.removeEventListener('click', removeClass)
@@ -192,6 +192,7 @@ export default function Editor() {
                     <FileTree
                         setCurrentFile={setCurrentFile}
                         setCurrentFileData={setCurrentFileData}
+                        currentFile={currentFile}
                     />
                     <div className="divider bg-red-900 px-2 h-auto cursor-ew-resize"
                         onMouseDown={onMouseDownFileTree}
@@ -203,23 +204,30 @@ export default function Editor() {
                         <div ref={monacoEl} className="flex-grow">
                         </div>
                     </div>
-
                 </div>
                 <div className="splitter border hover:cursor-ns-resize min-h-2 bg-blue-900"
                     onMouseDown={onMouseDownEditor}
                 ></div>
-                <div className="run-button flex flex-row gap-x-4 select-none w-12 m-2 cursor-pointer bg-green-500 text-white text-center p-2"
-                    onClick={runScript}
-                >
-                    <img src={run_btn} alt="Run" className="w-8 h-8" />
-                    <p class="items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md transition ease-in-out duration-150 select-none hidden"
-                        id='run-button-text'
+                <div className="btns flex flex-row gap-x-4 p-2">
+                    <div className="run flex flex-row gap-x-4 select-none w-12 m-2 cursor-pointer bg-green-500 text-white text-center p-2"
+                        onClick={runScript}
                     >
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </p>
+                        <img src={run_btn} alt="Run" className="w-8 h-8" />
+                        <p class="items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md transition ease-in-out duration-150 select-none hidden"
+                            id='run-button-text'
+                        >
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </p>
+                    </div>
+
+                    <div className="upload flex flex-row gap-x-4 select-none m-2 cursor-pointer bg-blue-500 text-white text-center p-2">
+                        <label htmlFor="py_upload" className="">Upload</label>
+                        <input type="file" id="py_upload" className="hidden" />
+                    </div>
+
                 </div>
 
                 <div className="output flex-grow">
