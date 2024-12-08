@@ -59,7 +59,7 @@ const recursiveBuild = (children: any, tree: any, path: string) => {
         name: child.name,
         path: path + "/" + child.name,
         dir: false,
-        contents: {}, // no need to get contents since we use FS.read for now
+        contents: {}, // no need to have contents since files are read by FS.read for now
         mode: child.mode,
         readmode: child.readMode,
         usedBytes: child.usedBytes,

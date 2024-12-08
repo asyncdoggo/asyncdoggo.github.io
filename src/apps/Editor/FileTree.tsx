@@ -82,6 +82,8 @@ export function FileTree(
         if (filename === null) {
             filename = prompt('Enter filename: ') || 'main.py';
         }
+        console.log(file_tree);
+        
         FS('write', { path: `${currentSelectedFolder}/${filename}`, data: '' });
         addNodeToTree(`${currentSelectedFolder}/${filename}`, file_tree!, false);
         updateFileTree();
@@ -129,27 +131,78 @@ export function FileTree(
     }
 
     const new_folder = () => {
-        const foldername = prompt('Enter folder name: ') || 'new_folder';
+        const foldername = prompt('Enter folder name: ') || 'new_folder';        
         FS('mkdir', { path: `${currentSelectedFolder}/${foldername}` });
         addNodeToTree(`${currentSelectedFolder}/${foldername}`, file_tree!, true);
         updateFileTree();
     }
 
 
+    const renameNodeInTree = (oldPath: string, newPath: string, tree: Tree) => {
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.path === oldPath) {
+                delete tree.contents[key];
+                const filename = newPath.split('/').pop()!;
+                tree.contents[filename] = {
+                    name: filename,
+                    dir: child.dir,
+                    contents: child.contents,
+                    mode: child.mode,
+                    readmode: child.readmode,
+                    usedBytes: child.usedBytes,
+                    path: newPath,
+                }
+                updateFilePathsInTree(oldPath, newPath, tree);
+                return true;
+            }
+            if (child.dir) {
+                if (renameNodeInTree(oldPath, newPath, child)){
+                    return;
+                }
+            }
+        }
+    }
+
+    const updateFilePathsInTree = (oldPath: string, newPath: string, tree: Tree) => {
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.dir) {
+                updateFilePathsInTree(oldPath, newPath, child);
+            }
+            if (child.path.startsWith(oldPath)) {
+                const newChildPath = newPath + child.path.slice(oldPath.length);
+                child.path = newChildPath;
+            }
+
+        }
+    }
+
+
     waitForElementFromRef(fileTreeContentRef, async () => {
         file_tree = await tree;
 
-        // If tree is empty, create a new file
+        // If tree is empty, create it
         if (Object.keys(file_tree!.contents).length === 0) {
             FS('write', { path: '/home/pyodide/main.py', data: '' });
             file_tree = {
-                name: 'main.py',
-                dir: false,
-                contents: {},
-                mode: 0,
-                readmode: 0,
-                usedBytes: 0,
-                path: '/home/pyodide/main.py',
+                "name": "root",
+                "contents": {
+                    "main.py": {
+                        "name": "main.py",
+                        "path": "/home/pyodide/main.py",
+                        "dir": false,
+                        "contents": null,
+                        "mode": 33206,
+                        "readmode": 365,
+                        "usedBytes": 0
+                    },
+                },
+                "dir": true,
+                "mode": 0,
+                "path": "/home/pyodide",
+                "readmode": 0,
+                "usedBytes": 0
             }
         }
 
@@ -219,9 +272,7 @@ export function FileTree(
                 style={{ display: 'none' }}
             >
                 <div id="context-menu-item-delete"
-                    onClick={(e: any) => {
-                        console.log(e.target.parentElement);
-                        
+                    onClick={(e: any) => {                        
                         if (e.target.parentElement.getAttribute('data-context-menu-dir') == 'true') {
                             deleteNode(e.target.parentElement.getAttribute('data-context-menu-path')!, true);
                         }
@@ -239,11 +290,12 @@ export function FileTree(
                     const oldPath = e.target.parentElement.getAttribute('data-context-menu-path')!;
                     
                     const newPath = oldPath.split('/').slice(0, -1).join('/') + '/' + newName;
-                    console.log(oldPath, newPath);
                     
                     FS('rename', { oldPath, newPath });
-                    removeNodeFromTree(oldPath, file_tree!);
-                    addNodeToTree(newPath, file_tree!, e.target.parentElement.getAttribute('data-context-menu-dir') === 'true');
+
+                    renameNodeInTree(oldPath, newPath, file_tree!);
+                    setCurrentSelectedFolder(newPath);
+                    
                     updateFileTree();
                 }}
                 >
@@ -261,7 +313,7 @@ const fileSelected = (
     setCurrentFile: (file: string) => void,
     setCurrentFileData: (data: string) => void,
     e: any
-) => {    
+) => {        
     if (file_tree.dir) {
         setCurrentSelectedFolder(file_tree.path);
     } else {
