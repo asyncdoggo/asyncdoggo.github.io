@@ -29,6 +29,53 @@ export default function Editor() {
     const setCurrentFile = (file: string) => {
         currentFile = file;
         document.querySelector('#file-name')!.textContent = file;
+        // infer type of file from extension and set language
+        let lang = 'python';
+        switch (file.split('.').pop()) {
+            case 'py':
+                lang = 'python';
+                break;
+            case 'js':
+                lang = 'javascript';
+                break;
+            case 'html':
+                lang = 'html';
+                break;
+            case 'css':
+                lang = 'css';
+                break;
+            case 'json':
+                lang = 'json';
+                break;
+            case 'xml':
+                lang = 'xml';
+                break;
+            case 'yaml':
+                lang = 'yaml';
+                break;
+            case 'md':
+                lang = 'markdown';
+                break;
+            case 'java':
+                lang = 'java';
+                break;
+            case 'c':
+                lang = 'c';
+                break;
+            case 'cpp':
+                lang = 'cpp';
+                break;
+            case 'rs':
+                lang = 'rust';
+                break;
+            case 'sh':
+                lang = 'shell';
+                break;
+            default:
+                lang = 'plaintext';
+                break;
+        }
+        editor?.setModel(monaco.editor.createModel(currentFileData, lang));
     }
 
     const setCurrentFileData = (data: string) => {
@@ -173,7 +220,7 @@ export default function Editor() {
     }
 
 
-    waitForElementFromRef(mainContainer, () => {        
+    waitForElementFromRef(mainContainer, () => {
         // listener stuff
         window.addEventListener('keydown', keyDownListener);
         document.addEventListener('click', removeClass);
