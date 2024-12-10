@@ -58,8 +58,9 @@ export function toggleMaximizeWindow(id: string) {
 
 
 export function waitForElement(selector: string, callback: any) {
-    if (document.querySelector(selector)) {
-        callback();
+    const ele = document.querySelector(selector)
+    if (ele) {
+        callback(ele);
     } else {
         setTimeout(() => {
             waitForElement(selector, callback);

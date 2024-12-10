@@ -17,9 +17,6 @@ export default function Editor() {
     const outputRef = React.useRef<HTMLDivElement>(null);
 
     let height = window.innerHeight / 4;
-    const setHeight = (value: number) => {
-        height = value;
-    }
 
     let loading = false;
 
@@ -122,12 +119,17 @@ export default function Editor() {
         const startY = e.clientY;
         const startHeight = height;
         const onMouseMove = (e: MouseEvent) => {
-            monacoEl.current!.style.height = `${startHeight + e.clientY - startY}px`;
+            height = startHeight + e.clientY - startY
+
+            if (height < 100) {
+                return;
+            }
+
+            monacoEl.current!.style.height = `${height}px`;
             editor?.layout({
                 width: editor!.getLayoutInfo().width,
-                height: startHeight + e.clientY - startY
+                height: height
             });
-            setHeight(startHeight + e.clientY - startY);
         }
         const onMouseUp = () => {
             window.removeEventListener('mousemove', onMouseMove);

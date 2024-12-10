@@ -1,5 +1,5 @@
 import * as React from 'jsx-dom';
-import { waitForElementFromRef } from '../../globals';
+import { waitForElement, waitForElementFromRef } from '../../globals';
 import { Tree, FS, tree } from '../../utils/pyodide_helper';
 
 import new_file_icon from '../../assets/new-file.svg';
@@ -86,6 +86,8 @@ export function FileTree(
         const treeElement = buildTree(file_tree!, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData);
         fileTreeContentRef.current!.innerHTML = '';
         fileTreeContentRef.current!.appendChild(treeElement);
+
+        sessionStorage.setItem('file_tree', JSON.stringify(file_tree));
     }
 
 
@@ -101,7 +103,7 @@ export function FileTree(
             alert('Error');
             return;
         }
-        
+
         addNodeToTree(`${currentSelectedFolder}/${filename}`, file_tree!, false);
         updateFileTree();
     }
@@ -202,36 +204,43 @@ export function FileTree(
 
 
     waitForElementFromRef(fileTreeContentRef, async () => {
-        file_tree = await tree;
-
-        // If tree is empty, create it
-        if (Object.keys(file_tree!.contents).length === 0) {
-            try {
-                await FS('write', { path: '/home/pyodide/main.py', data: '' });
-                file_tree = {
-                    "name": "root",
-                    "contents": {
-                        "main.py": {
-                            "name": "main.py",
-                            "path": "/home/pyodide/main.py",
-                            "dir": false,
-                            "contents": null,
-                            "mode": 33206,
-                            "readmode": 365,
-                            "usedBytes": 0
+        if (sessionStorage.getItem('file_tree')) {
+            file_tree = JSON.parse(sessionStorage.getItem('file_tree')!);
+        }
+        else {
+            file_tree = await tree;
+            // If tree is empty, create it
+            if (Object.keys(file_tree!.contents).length === 0) {
+                try {
+                    await FS('write', { path: '/home/pyodide/main.py', data: '' });
+                    file_tree = {
+                        "name": "root",
+                        "contents": {
+                            "main.py": {
+                                "name": "main.py",
+                                "path": "/home/pyodide/main.py",
+                                "dir": false,
+                                "contents": null,
+                                "mode": 33206,
+                                "readmode": 365,
+                                "usedBytes": 0
+                            },
                         },
-                    },
-                    "dir": true,
-                    "mode": 0,
-                    "path": "/home/pyodide",
-                    "readmode": 0,
-                    "usedBytes": 0
+                        "dir": true,
+                        "mode": 0,
+                        "path": "/home/pyodide",
+                        "readmode": 0,
+                        "usedBytes": 0
+                    }
+                }
+                catch (e) {
+                    alert('Something went wrong');
                 }
             }
-            catch (e) {
-                alert('Something went wrong');
-            }
+            sessionStorage.setItem('file_tree', JSON.stringify(file_tree));
         }
+
+
 
         updateFileTree();
         try {
@@ -245,68 +254,74 @@ export function FileTree(
         }
 
 
-        document.getElementById('py_upload')!.addEventListener('change', (e: Event) => {
-            const target = e.target as HTMLInputElement;
-            const file = target.files![0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = e.target!.result as string;
-                try {
-                    FS('write', { path: `/home/pyodide/${file.name}`, data });
-                    setCurrentFileData(data);
-                    setCurrentFile(file.name);
+        waitForElement('#py_upload', async (ele: any) => {
+            ele.addEventListener('change', (e: Event) => {
+                console.log('uploading');
+                
+                const target = e.target as HTMLInputElement;
+                const file = target.files![0];
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const data = e.target!.result as ArrayBuffer;
+                    const binary = new Uint8Array(data);
+                    await FS('write', { path: `/home/pyodide/${file.name}`, data: binary });
                     addNodeToTree(`/home/pyodide/${file.name}`, file_tree!, false);
                     updateFileTree();
-
-                    // css selector to select the file tree node
-                    const selectedElements = document.querySelectorAll('.selected');
-                    selectedElements.forEach((element) => {
-                        element.classList.remove('selected');
-                    });
-                    const selector = `[data-name="/home/pyodide/${file.name}"]`;
-                    const element = document.querySelector(selector);
-                    element?.classList.add('selected');
-                    // remove selected class from all elements
                 }
-                catch (e) {
-                    alert('Something went wrong, perhaps a file with the same name already exists');
-                }
-            }
-            reader.readAsText(file);
-        });
 
-        document.getElementById("editor_download_button")!.addEventListener('click', async () => {
-            const data = await FS('download', { path: '/home/pyodide'});
-            // recursively build the file tree and zip it
-            const zip = new JSZip();
-            buildZip(zip, data);
-            zip.generateAsync({ type: "blob" }).then((content) => {
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'project.zip';
-                a.click();
-                URL.revokeObjectURL(url);
+                reader.onloadstart = () => {
+                    (document.getElementsByClassName('file-tree-header')[0] as HTMLElement).innerText = "Uploading...";
+                }
+
+                reader.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        (document.getElementsByClassName('file-tree-header')[0] as HTMLElement).innerText = `Uploading... ${percent}%`;
+                    }
+                }
+
+                reader.onloadend = () => {
+                    (document.getElementsByClassName('file-tree-header')[0] as HTMLElement).innerText = "Files";
+                }
+
+                reader.readAsArrayBuffer(file);
             });
-
         });
 
-        const buildZip = (zip: JSZip, tree: Tree) => {
-            for (const key in tree.contents) {
-                const child = tree.contents[key] as Tree;
-                if (child.dir) {
-                    const folder = zip.folder(child.name);
-                    buildZip(folder!, child);
-                }
-                else {
-                    // convert tree.contents from uint8array to string                    
-                    const data = new TextDecoder().decode(child.contents as unknown as Uint8Array || new Uint8Array());
-                    zip.file(child.name, data);
-                }
-            }
-        }
+        waitForElement('#editor_download_button', async (ele: any) => {
+            ele.addEventListener('click', async () => {
+                const data = await FS('download', { path: '/home/pyodide' });
+                // recursively build the file tree and zip it
+                const zip = new JSZip();
+                buildZip(zip, data);
+                zip.generateAsync({ type: "blob" }).then((content) => {
+                    const url = URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'project.zip';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+
+            });
+        });
 
     });
+
+    const buildZip = (zip: JSZip, tree: Tree) => {
+        for (const key in tree.contents) {
+            const child = tree.contents[key] as Tree;
+            if (child.dir) {
+                const folder = zip.folder(child.name);
+                buildZip(folder!, child);
+            }
+            else {
+                // convert tree.contents from uint8array to string                    
+                const data = new TextDecoder().decode(child.contents as unknown as Uint8Array || new Uint8Array());
+                zip.file(child.name, data);
+            }
+        }
+    }
 
     return (
         <div
