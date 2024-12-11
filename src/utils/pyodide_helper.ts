@@ -52,7 +52,11 @@ export async function FS(action: string, args: any) {
 
 
 
-async function fetchTree() {
+export async function fetchTree() {
+    while (py.state !== "idle") {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
     const tree = await py.call(py.workerProxy.FS, { action: "tree", args: { path: "/home/pyodide" } });    
     return tree;
 }

@@ -1,7 +1,7 @@
 import * as React from 'jsx-dom';
 import { waitForElement, waitForElementFromRef } from '../../globals';
-import { Tree, FS, tree } from '../../utils/pyodide_helper';
-
+import { Tree, FS, tree, fetchTree } from '../../utils/pyodide_helper';
+import refresh_btn from '../../assets/refresh.svg';
 import new_file_icon from '../../assets/new-file.svg';
 import new_folder_icon from '../../assets/folder-new.svg';
 import { buildTree } from './BuildTree';
@@ -51,6 +51,7 @@ export function FileTree(
                 return;
             }
         }
+        await FS('sync', {});
         removeNodeFromTree(path, file_tree!);
         updateFileTree();
         
@@ -100,11 +101,12 @@ export function FileTree(
             return;
         }
 
+        await FS('sync', {});
         addNodeToTree(`${currentSelectedFolder}/${filename}`, file_tree!, false);
         updateFileTree();
     }
 
-    const new_folder = () => {
+    const new_folder = async () => {
         const foldername = prompt('Enter folder name: ') || 'new_folder';
         try {
             FS('mkdir', { path: `${currentSelectedFolder}/${foldername}` });
@@ -113,6 +115,8 @@ export function FileTree(
             alert('Folder already exists');
             return
         }
+
+        await FS('sync', {});
         addNodeToTree(`${currentSelectedFolder}/${foldername}`, file_tree!, true);
         updateFileTree();
     }
@@ -335,6 +339,15 @@ export function FileTree(
                     onClick={() => new_folder()}
                 >
                     <img src={new_folder_icon} alt="New Folder" className="w-6 h-6 invert" />
+                </button>
+                <button id="refresh_file_tree" className="refresh"
+                    onClick={async () => {
+                        const new_tree = await fetchTree();
+                        file_tree = new_tree;
+                        updateFileTree();
+                    }}
+                >
+                <img src={refresh_btn} alt="Refresh" className="w-6 h-6 invert" />
                 </button>
             </div>
 
