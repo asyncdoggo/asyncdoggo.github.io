@@ -53,16 +53,12 @@ export function FileTree(
         }
         removeNodeFromTree(path, file_tree!);
         updateFileTree();
-        if (currentFile === path) {
-            try {
-                const data = await FS('read', { path: '/home/pyodide/main.py' })
-                setCurrentFile('/home/pyodide/main.py');
-                setCurrentFileData(data);
-            }
-            catch (e) {
-                alert('Something went wrong');
-            }
-        }
+        
+        const data = await FS('read', { path: '/home/pyodide/main.py' })
+        setCurrentFile('/home/pyodide/main.py');
+        setCurrentFileData(data);
+        console.log(currentFile);
+        
     }
 
 

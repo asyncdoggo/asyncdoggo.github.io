@@ -102,7 +102,6 @@ export default function Editor() {
                     }
                 }
 
-
                 monacoEl.current!.style.height = `${height}px`;
                 editor?.layout({
                     width: document.getElementById('Editor')!.clientWidth - document.getElementById('file-tree')!.clientWidth,
