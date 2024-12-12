@@ -88,6 +88,7 @@ export default function Taskbar() {
             <div
                 className="start flex items-center hover:bg-gray-200 h-full pr-4"
                 ref={profileRef}
+                id='show-start-menu'
                 onClick={() => {
                     showStartMenu = !showStartMenu
                     handleRenderStartMenu()
@@ -223,6 +224,14 @@ function StartMenu() {
 
 
     const startMenuRef = useRef<HTMLDivElement>(null);
+
+    document.addEventListener('click', (e) => {
+        const show_btn = document.getElementById('show-start-menu')
+        if (show_btn && !show_btn.contains(e.target as Node) && showStartMenu) {
+            showStartMenu = false
+            handleRenderStartMenu()
+        }
+    })
 
     return (
         <div

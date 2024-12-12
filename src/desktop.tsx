@@ -19,27 +19,27 @@ export default function Desktop() {
             <div className="Desktop-icons-grid flex flex-row gap-x-4 p-4">
 
                 <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('File Explorer', file_manager_icon, <FileManager />)}>
-                    <img src={file_manager_icon} alt="File Explorer" className="h-16 w-16" />
+                    <img src={file_manager_icon} alt="File Explorer" className="h-14 w-14" />
                     <p className="text-white">File Explorer</p>
                 </button>
 
                 <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Games', games_icon, <FileManager rootFolderName="Games" />)}>
-                    <img src={games_icon} alt="Games" className="h-16 w-16" />
+                    <img src={games_icon} alt="Games" className="h-14 w-14" />
                     <p className="text-white">Games</p>
                 </button>
 
                 <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Python', python, <PythonREPL />, "700px", "450px")}>
-                    <img src={python} alt="Python" className="h-16 w-16" />
+                    <img src={python} alt="Python" className="h-14 w-14" />
                     <p className="text-white">Python</p>
                 </button>
 
                 <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('ChatBot', chatbot_icon, <ChatBot />, "700px", "450px")}>
-                    <img src={chatbot_icon} alt="ChatBot" className="h-16 w-16" />
+                    <img src={chatbot_icon} alt="ChatBot" className="h-14 w-14" />
                     <p className="text-white">ChatBot</p>
                 </button>
 
                 <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Editor', editor_svg, <Editor />, "700px", "450px")}>
-                    <img src={editor_svg} alt="Editor" className="h-16 w-16" />
+                    <img src={editor_svg} alt="Editor" className="h-14 w-14" />
                     <p className="text-white">Editor</p>
                 </button>
 
