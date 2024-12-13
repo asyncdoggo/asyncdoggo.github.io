@@ -11,11 +11,9 @@ export function FileTree(
     {
         setCurrentFile,
         setCurrentFileData,
-        currentFile,
     }: {
         setCurrentFile: (file: string) => void,
         setCurrentFileData: (data: string) => void,
-        currentFile: string,
     }
 ) {
 
@@ -53,13 +51,11 @@ export function FileTree(
         }
         await FS('sync', {});
         removeNodeFromTree(path, file_tree!);
-        updateFileTree();
-        
+        // updateFileTree();
+
         const data = await FS('read', { path: '/home/pyodide/main.py' })
         setCurrentFile('/home/pyodide/main.py');
         setCurrentFileData(data);
-        console.log(currentFile);
-        
     }
 
 
@@ -69,6 +65,7 @@ export function FileTree(
             const child = tree.contents[key] as Tree;
             if (child.path === path) {
                 delete tree.contents[key];
+                document.getElementById(path)!.remove();
                 return;
             }
             if (child.dir) {
@@ -78,12 +75,10 @@ export function FileTree(
     }
 
 
-    const updateFileTree = async () => {
-        // build the dom using tree imported from pyodide_helper
+    const buildFileTree = async () => {
         const treeElement = buildTree(file_tree!, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData);
         fileTreeContentRef.current!.innerHTML = '';
         fileTreeContentRef.current!.appendChild(treeElement);
-
         sessionStorage.setItem('file_tree', JSON.stringify(file_tree));
     }
 
@@ -103,7 +98,7 @@ export function FileTree(
 
         await FS('sync', {});
         addNodeToTree(`${currentSelectedFolder}/${filename}`, file_tree!, false);
-        updateFileTree();
+        // updateFileTree();
     }
 
     const new_folder = async () => {
@@ -118,10 +113,10 @@ export function FileTree(
 
         await FS('sync', {});
         addNodeToTree(`${currentSelectedFolder}/${foldername}`, file_tree!, true);
-        updateFileTree();
+        // updateFileTree();
     }
 
-    const addNodeToTree = (path: string, tree: Tree, isFolder: boolean) => {
+    const addNodeToTree = (path: string, tree: Tree, isFolder: boolean, depth: number = 0) => {
         const filename = path.split('/').pop()!;
         const folderPath = path.split('/').slice(3, -1) // 3 to ignore /home/pyodide(plus empty string at the start) and -1 to ignore the filename
 
@@ -135,6 +130,7 @@ export function FileTree(
                 readmode: 0,
                 usedBytes: 0,
             };
+            document.getElementById(currentSelectedFolder)!.appendChild(buildTree(tree.contents[filename] as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData));
             return;
         }
 
@@ -151,10 +147,12 @@ export function FileTree(
                         usedBytes: 0,
                         path: path,
                     };
+                    document.getElementById(currentSelectedFolder)!.querySelector(".file-tree-children")!.appendChild(buildTree(child.contents[filename] as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData));
+                    (document.getElementById(currentSelectedFolder)!.querySelector('.file-tree-children')! as HTMLElement).style.display = 'block';
                     return true;
                 }
-                if (folderPath[0] === child.name) {
-                    if (addNodeToTree(path, child, isFolder)) {
+                if (folderPath[depth] === child.name) {
+                    if (addNodeToTree(path, child, isFolder, depth+1)) {
                         return;
                     }
                 }
@@ -162,13 +160,13 @@ export function FileTree(
         }
     }
 
-    const renameNodeInTree = (oldPath: string, newPath: string, tree: Tree) => {
-        for (const key in tree.contents) {
-            const child = tree.contents[key] as Tree;
+    const renameNodeInTree = (oldPath: string, newPath: string, nodeTree: Tree) => {
+        for (const key in nodeTree.contents) {
+            const child = nodeTree.contents[key] as Tree;
             if (child.path === oldPath) {
-                delete tree.contents[key];
+                delete nodeTree.contents[key];
                 const filename = newPath.split('/').pop()!;
-                tree.contents[filename] = {
+                nodeTree.contents[filename] = {
                     name: filename,
                     dir: child.dir,
                     contents: child.contents,
@@ -177,13 +175,15 @@ export function FileTree(
                     usedBytes: child.usedBytes,
                     path: newPath,
                 }
-                updateFilePathsInTree(oldPath, newPath, tree);
+                updateFilePathsInTree(oldPath, newPath, nodeTree);
+
+                document.getElementById(oldPath)!.remove();
+                const old_path_parent = oldPath.split('/').slice(0, -1).join('/');
+                document.getElementById(old_path_parent)!.querySelector(".file-tree-children")!.appendChild(buildTree(nodeTree.contents[filename] as Tree, setCurrentSelectedFolder, setCurrentFile, setCurrentFileData));
                 return true;
             }
             if (child.dir) {
-                if (renameNodeInTree(oldPath, newPath, child)) {
-                    return;
-                }
+                renameNodeInTree(oldPath, newPath, child);
             }
         }
     }
@@ -240,9 +240,7 @@ export function FileTree(
             sessionStorage.setItem('file_tree', JSON.stringify(file_tree));
         }
 
-
-
-        updateFileTree();
+        buildFileTree();
         try {
             const data = await FS('read', { path: '/home/pyodide/main.py' })
             currentSelectedFolder = '/home/pyodide';
@@ -256,8 +254,6 @@ export function FileTree(
 
         waitForElement('#py_upload', async (ele: any) => {
             ele.addEventListener('change', (e: Event) => {
-                console.log('uploading');
-                
                 const target = e.target as HTMLInputElement;
                 const file = target.files![0];
                 const reader = new FileReader();
@@ -266,7 +262,7 @@ export function FileTree(
                     const binary = new Uint8Array(data);
                     await FS('write', { path: `/home/pyodide/${file.name}`, data: binary });
                     addNodeToTree(`/home/pyodide/${file.name}`, file_tree!, false);
-                    updateFileTree();
+                    // updateFileTree();
                 }
 
                 reader.onloadstart = () => {
@@ -344,16 +340,17 @@ export function FileTree(
                     onClick={async () => {
                         const new_tree = await fetchTree();
                         file_tree = new_tree;
-                        updateFileTree();
+                        buildFileTree();
                     }}
                 >
-                <img src={refresh_btn} alt="Refresh" className="w-6 h-6 invert" />
+                    <img src={refresh_btn} alt="Refresh" className="w-6 h-6 invert" />
                 </button>
             </div>
 
 
             <div className="file-tree-content"
-                id="file-tree-content"
+                id="/home/pyodide"
+
                 ref={fileTreeContentRef}
             >
                 loading...
@@ -385,7 +382,7 @@ export function FileTree(
                             const data = await FS('read', { path: copiedPath });
                             await FS('write', { path: `${path}/${copiedPath.split('/').pop()}`, data });
                             addNodeToTree(`${path}/${copiedPath.split('/').pop()}`, file_tree!, false);
-                            updateFileTree();
+                            // updateFileTree();
                         } catch (e) {
                             alert('No file copied');
                         }
@@ -420,7 +417,7 @@ export function FileTree(
                             await FS('rename', { oldPath, newPath });
                             renameNodeInTree(oldPath, newPath, file_tree!);
                             setCurrentSelectedFolder(newPath);
-                            updateFileTree();
+                            // updateFileTree();
                         }
                         catch (e) {
                             alert('File or folder with the same name already exists');

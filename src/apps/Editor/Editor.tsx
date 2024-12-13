@@ -240,7 +240,6 @@ export default function Editor() {
                     <FileTree
                         setCurrentFile={setCurrentFile}
                         setCurrentFileData={setCurrentFileData}
-                        currentFile={currentFile}
                     />
                     <div className="divider bg-red-900 px-2 h-auto cursor-ew-resize"
                         onMouseDown={onMouseDownFileTree}

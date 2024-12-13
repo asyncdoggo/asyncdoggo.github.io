@@ -21,10 +21,13 @@ export const buildTree = (
 
 
     return (
-        <div className="file-tree-node w-full flex flex-col justify-center items-start">
-            <div className="flex flex-col w-full justify-between">
+        <div className="file-tree-node w-full flex flex-col justify-between items-start"
+        id={file_tree.path}
+        data-folder={file_tree.dir ? 'true' : 'false'}
+        >
+            {/* <div className="flex flex-col w-full justify-between"> */}
                 <div className={"file-tree-node-name w-full justify-between flex flex-row" + (file_tree.path === "/home/pyodide/main.py" ? " selected" : "")}
-                    data-name={file_tree.path}
+                    // data-name={file_tree.path}
                     onClick={(e) => {
                         fileSelected(
                             file_tree,
@@ -55,7 +58,8 @@ export const buildTree = (
                         file_tree.dir ?
                             (
                                 <div className="file-tree-node-dropdown" onClick={() => {
-                                    const children = document.getElementById(file_tree.path)!;
+                                    const parent = document.getElementById(file_tree.path)!;
+                                    const children = parent.querySelector('.file-tree-children')! as HTMLElement;
                                     if (children.style.display === 'none') {
                                         children.style.display = 'block';
                                     } else {
@@ -72,9 +76,8 @@ export const buildTree = (
 
                 {file_tree.dir && (
                     <div
-                        className="file-tree-children pl-2"
+                        className="file-tree-children pl-2 flex justify-between items-start w-full"
                         style={{ display: 'none' }}
-                        id={file_tree.path}
                     >
                         {Object.values(file_tree.contents || {}).map((child, index) => (
                             <React.Fragment key={index}>
@@ -83,7 +86,7 @@ export const buildTree = (
                         ))}
                     </div>
                 )}
-            </div>
+            {/* </div> */}
         </div>
     );
 }
