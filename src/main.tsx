@@ -16,7 +16,6 @@ const blogs = [
     "/blogs/refraction"
 ]
 
-
 const NavBar = () => {
     const [url, setUrl] = useText(window.location.pathname)
     if (window.location.pathname === "/blogs" || window.location.pathname === "/blogs/") {

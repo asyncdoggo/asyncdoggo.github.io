@@ -37,7 +37,7 @@ export function updateTaskBar() {
         openApps.forEach(app => {
             const appIcon = <div
                 title={app.name}
-                className="taskbar-app-item px-2 py-2 hover:bg-gray-200"
+                className="taskbar-app-item px-3 py-2 hover:bg-white/30 rounded-lg transition-all duration-250 cursor-pointer"
                 onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -57,7 +57,7 @@ export function updateTaskBar() {
                     }
                 }}
             >
-                <img src={app.icon} alt={app.name} className="h-8 w-8" />
+                <img src={app.icon} alt={app.name} className="h-7 w-7 drop-shadow-sm" />
             </div>
             taskbarApps.appendChild(appIcon)
         })
@@ -82,11 +82,11 @@ export default function Taskbar() {
 
     return (
         <div
-            className="fixed bottom-0 w-full taskbar h-12 bg-[#e940a5] text-white flex justify-between items-center"
+            className="fixed bottom-0 w-full taskbar h-14 bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 text-white flex justify-between items-center backdrop-blur-md"
             id="taskbar_main"
         >
             <div
-                className="start flex items-center hover:bg-gray-200 h-full pr-4"
+                className="start flex items-center hover:bg-white/20 h-full px-4 rounded-r-lg transition-colors cursor-pointer"
                 ref={profileRef}
                 id='show-start-menu'
                 onClick={() => {
@@ -94,8 +94,9 @@ export default function Taskbar() {
                     handleRenderStartMenu()
 
                 }}
+                title="Start Menu"
             >
-                <img src={user_icon} alt="user" className="h-8 w-8 ml-2" />
+                <img src={user_icon} alt="user" className="h-6 w-6" />
             </div>
             {
                 (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? (
@@ -104,20 +105,20 @@ export default function Taskbar() {
             }
 
 
-            <div className="w-full h-full px-2 mr-4 open-apps flex gap-x-4 items-center"
+            <div className="w-full h-full px-2 mr-4 open-apps flex gap-x-2 items-center"
                 id="taskbar_apps">
             </div>
 
 
-            <div className="center w-42 flex items-center pr-1" ref={dateDivRef}>
+            <div className="center px-4 flex items-center text-sm font-medium whitespace-nowrap" ref={dateDivRef}>
                 {/* Date and time */}
                 {new Date().toDateString()} {new Date().toLocaleTimeString()}
             </div>
 
 
-            <div id="context-menu" className="bg-gray-900 fixed border border-gray-300 rounded-lg shadow-lg hidden">
+            <div id="context-menu" className="bg-gray-900/95 fixed border border-gray-700 rounded-lg shadow-xl hidden backdrop-blur-sm z-50">
                 
-                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-700 text-white text-sm transition-colors"
                     onClick={() => {
                         const contextMenu = document.getElementById('context-menu')
                         if (contextMenu) {
@@ -137,7 +138,7 @@ export default function Taskbar() {
                 </div>
 
 
-                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-700 text-white text-sm transition-colors"
                     onClick={() => {
                         const contextMenu = document.getElementById('context-menu')
                         if (contextMenu) {
@@ -151,7 +152,7 @@ export default function Taskbar() {
                 >
                     Maximize/Minimize
                 </div>
-                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-600"
+                <div className="context-menu-item p-2 cursor-pointer hover:bg-gray-700 text-white text-sm transition-colors"
                     onClick={() => {
                         const contextMenu = document.getElementById('context-menu')
                         if (contextMenu) {
@@ -235,34 +236,34 @@ function StartMenu() {
 
     return (
         <div
-            className="start-menu bg-[#a22666] fixed w-64 h-[40vh] border border-gray-300 rounded-lg shadow-lg hidden select-none bottom-[50px]"
+            className="start-menu glass bg-white/80 fixed w-64 rounded-2xl shadow-2xl hidden select-none bottom-[65px] left-2 z-50 overflow-hidden"
             ref={startMenuRef}
             id='start-menu'
         >
             <div
-                className="flex items-center p-2 hover:bg-gray-300 w-full cursor-pointer"
+                className="flex items-center p-4 hover:bg-gradient-to-r hover:from-pink-100 hover:to-purple-100 w-full cursor-pointer transition-colors font-medium"
                 onClick={() => {
                     showStartMenu = false
                     handleRenderStartMenu()
                     startApplication('Profile', settings, <Profile />)
                 }}
             >
-                <img src={user_white} alt="user" className="h-8 w-8 ml-2" />
-                <span className="text-white ml-2">Ayush Deshpande</span>
+                <img src={user_white} alt="user" className="h-8 w-8 ml-2 rounded-full" />
+                <span className="ml-3 text-gray-800 font-semibold">Ayush Deshpande</span>
             </div>
-            <hr className="border border-gray-300" />
+            <hr className="border border-gray-200" />
             <div className="flex flex-col items-center">
                 {startItems.map((item) => (
                     <div
-                        className="flex items-center p-2 hover:bg-gray-300 w-full hover:cursor-pointer"
+                        className="flex items-center p-3 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 w-full hover:cursor-pointer transition-colors text-gray-800"
                         onClick={() => {
                             showStartMenu = false
                             handleRenderStartMenu()
                             startApplication(item.name, item.icon, item.component, item.width, item.height)
                         }}
                     >
-                        <img src={item.icon} alt={item.name} className="h-8 w-8 invert" />
-                        <span className="ml-2">{item.name}</span>
+                        <img src={item.icon} alt={item.name} className="h-6 w-6 invert" />
+                        <span className="ml-3 text-sm font-medium">{item.name}</span>
                     </div>
                 ))}
             </div>

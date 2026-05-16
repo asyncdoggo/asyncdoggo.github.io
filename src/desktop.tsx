@@ -16,37 +16,32 @@ import editor_svg from "./assets/editor.svg";
 export default function Desktop() {
     return (
         <div className="desktop">
-            <div className="Desktop-icons-grid flex flex-row gap-x-4 p-4">
+            <div className="Desktop-icons-grid flex flex-col gap-y-6 p-8">
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('File Explorer', file_manager_icon, <FileManager />)}>
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('File Explorer', file_manager_icon, <FileManager />)}>
                     <img src={file_manager_icon} alt="File Explorer" className="h-14 w-14" />
-                    <p className="text-white">File Explorer</p>
+                    <p className="text-white text-xs font-medium mt-2">File Explorer</p>
                 </button>
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Games', games_icon, <FileManager rootFolderName="Games" />)}>
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('Games', games_icon, <FileManager rootFolderName="Games" />)}>
                     <img src={games_icon} alt="Games" className="h-14 w-14" />
-                    <p className="text-white">Games</p>
+                    <p className="text-white text-xs font-medium mt-2">Games</p>
                 </button>
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Python', python, <PythonREPL />, "700px", "450px")}>
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('Python', python, <PythonREPL />, "700px", "450px")}>
                     <img src={python} alt="Python" className="h-14 w-14" />
-                    <p className="text-white">Python</p>
+                    <p className="text-white text-xs font-medium mt-2">Python</p>
                 </button>
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('ChatBot', chatbot_icon, <ChatBot />, "700px", "450px")}>
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('ChatBot', chatbot_icon, <ChatBot />, "700px", "450px")}>
                     <img src={chatbot_icon} alt="ChatBot" className="h-14 w-14" />
-                    <p className="text-white">ChatBot</p>
+                    <p className="text-white text-xs font-medium mt-2">ChatBot</p>
                 </button>
 
-                <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => startApplication('Editor', editor_svg, <Editor />, "700px", "450px")}>
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('Editor', editor_svg, <Editor />, "700px", "450px")}>
                     <img src={editor_svg} alt="Editor" className="h-14 w-14" />
-                    <p className="text-white">Editor</p>
+                    <p className="text-white text-xs font-medium mt-2">Editor</p>
                 </button>
-
-                {/* <button className="icon w-24 h-16 flex flex-col justify-center items-center" onClick={() => { window.location.href = "/editor" }}>
-                    <img src={python} alt="Editor" className="h-16 w-16" />
-                    <p className="text-white">Editor</p>
-                </button> */}
 
             </div>
             <Taskbar />
