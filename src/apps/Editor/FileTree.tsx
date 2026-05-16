@@ -234,7 +234,7 @@ export function FileTree(
                     }
                 }
                 catch (e) {
-                    alert('Something went wrong');
+                    console.log(e);
                 }
             }
             sessionStorage.setItem('file_tree', JSON.stringify(file_tree));
@@ -248,7 +248,7 @@ export function FileTree(
             setCurrentFileData(data);
         }
         catch (e) {
-            alert('Something went wrong');
+            console.log(e);
         }
 
 

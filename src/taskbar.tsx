@@ -46,13 +46,13 @@ export function updateTaskBar() {
                 onContextMenu={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-
+                    
                     // find mouse position and open context menu
                     const contextMenu = document.getElementById('context-menu')
                     if (contextMenu) {
                         contextMenu.style.display = 'block'
                         contextMenu.style.left = `${e.clientX}px`
-                        contextMenu.style.top = `${e.clientY - contextMenu.clientHeight}px`
+                        contextMenu.style.top = `${-contextMenu.clientHeight}px`
                         contextMenu.setAttribute('data-app', app.name)
                     }
                 }}

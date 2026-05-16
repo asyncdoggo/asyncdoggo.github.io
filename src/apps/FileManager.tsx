@@ -10,10 +10,12 @@ import back_icon from "../assets/back.svg"
 import tictactoe_icon from "../assets/tictactoe.svg"
 import pong_icon from "../assets/pong.svg"
 import air_hockey_icon from "../assets/air_hockey.svg"
+import snake_icon from "../assets/snake.png"
 import TicTacToe from '../games/tictactoe';
 import Pong from '../games/pong';
 import AirHockey from '../games/airhockey';
 import ImageViewer, { images } from './ImageViewer';
+import Snake from "../games/snake";
 
 
 
@@ -108,6 +110,14 @@ export const root = {
                     component: () => <AirHockey />,
                     width: '600px',
                     height: '800px'
+                },
+                {
+                    name: "Snake",
+                    type: 'window_open',
+                    icon: snake_icon,
+                    component: () => <Snake />,
+                    width: '650px',
+                    height: '700px'
                 },
             ]
         },
