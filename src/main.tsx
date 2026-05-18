@@ -78,5 +78,5 @@ window.addEventListener('load', () => {
 })
 
 // document.body.appendChild(<div id="Editor">
-//     <Snake />
+//     <Breakout />
 // </div>)

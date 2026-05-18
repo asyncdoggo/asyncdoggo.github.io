@@ -5,8 +5,6 @@ import { openApps, toggleMinimizeWindow, currentFocusedApp, removeCurrentFocused
 import settings from "./assets/settings.svg"
 import file_manager from "./assets/file_manager.svg"
 import FileManager from './apps/FileManager';
-import projects_icon from "./assets/projects.svg"
-import Profile from './Profile';
 import Notes from './apps/Notes';
 import user_icon from "./assets/user.svg"
 import user_white from "./assets/user_white.svg"
@@ -200,11 +198,6 @@ function StartMenu() {
 
     const startItems = [
         {
-            name: "Projects",
-            icon: projects_icon,
-            component: <FileManager rootFolderName="Projects" />,
-        },
-        {
             name: "Calculator",
             icon: calculator_icon,
             component: <Calculator />,
@@ -236,7 +229,7 @@ function StartMenu() {
 
     return (
         <div
-            className="start-menu glass bg-white/80 fixed w-64 rounded-2xl shadow-2xl hidden select-none bottom-[65px] left-2 z-50 overflow-hidden"
+            className="start-menu !bg-gray-700 glass fixed w-64 rounded-2xl shadow-2xl hidden select-none bottom-[65px] left-2 z-50 overflow-hidden"
             ref={startMenuRef}
             id='start-menu'
         >
@@ -245,11 +238,10 @@ function StartMenu() {
                 onClick={() => {
                     showStartMenu = false
                     handleRenderStartMenu()
-                    startApplication('Profile', settings, <Profile />)
                 }}
             >
                 <img src={user_white} alt="user" className="h-8 w-8 ml-2 rounded-full" />
-                <span className="ml-3 text-gray-800 font-semibold">Ayush Deshpande</span>
+<span className="ml-3 text-white font-semibold">User</span>
             </div>
             <hr className="border border-gray-200" />
             <div className="flex flex-col items-center">
@@ -263,7 +255,7 @@ function StartMenu() {
                         }}
                     >
                         <img src={item.icon} alt={item.name} className="h-6 w-6 invert" />
-                        <span className="ml-3 text-sm font-medium">{item.name}</span>
+                        <span className="ml-3 text-sm font-medium text-white">{item.name}</span>
                     </div>
                 ))}
             </div>

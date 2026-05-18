@@ -12,6 +12,8 @@ import ChatBot from "./apps/ChatBot/ChatBot";
 import blogs_icon from "./assets/blogs.svg";
 import Editor from "./apps/Editor/Editor";
 import editor_svg from "./assets/editor.svg";
+import calculator_icon from "./assets/calculator.svg";
+import Calculator from "./apps/calculator";
 
 export default function Desktop() {
     return (
@@ -42,7 +44,10 @@ export default function Desktop() {
                     <img src={editor_svg} alt="Editor" className="h-14 w-14" />
                     <p className="text-white text-xs font-medium mt-2">Editor</p>
                 </button>
-
+                <button className="icon w-24 h-24 flex flex-col justify-center items-center rounded-lg hover:scale-105 active:scale-95" onClick={() => startApplication('Calculator', calculator_icon, <Calculator />,'350px', '500px',)}>
+                    <img src={calculator_icon} alt="Calculator" className="h-14 w-14" />
+                    <p className="text-white text-xs font-medium mt-2">Calculator</p>
+                </button>
             </div>
             <Taskbar />
         </div>
@@ -60,8 +65,7 @@ export function MobileDesktop() {
 
             <div className="Desktop-icons-grid flex flex-row gap-x-4 p-4">
 
-                <button className="icon pt-2
-             invert w-24 h-16 flex flex-col justify-center items-center" onClick={() => { window.location.href = "/blogs" }}>
+                <button className="icon pt-2 invert w-24 h-16 flex flex-col justify-center items-center" onClick={() => { window.location.href = "/blogs" }}>
                     <img src={blogs_icon} alt="Blogs" className="h-16 w-16" />
                     <p className="text-white invert">Blogs</p>
                 </button>
